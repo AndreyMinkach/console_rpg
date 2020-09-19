@@ -1,7 +1,9 @@
-from creature import *
+from Creatures.creature import *
+from Creatures.player import Player
+from Creatures.zombie import Zombie
 
 
-def adventure(h: Hero):
+def adventure(h: Player):
     choose = input("Choose difficulty\n"
                    "1) Easy\n"
                    "2) Medium\n"
@@ -14,7 +16,7 @@ def adventure(h: Hero):
         battle(Zombie(1, "Enderman", 1, 200, 0.9), h)
 
 
-def battle(enemy: Zombie, hero: Hero):
+def battle(enemy: Zombie, hero: Player):
     print(f"Your opponent is {Style.MAGENTA + Style.UNDERLINE + enemy.name}" + Style.RESET +
           f" with {Style.GREEN + str(enemy.health)} hp, "
           f"{Style.RED + str(enemy.total_damage)} dmg" + Style.RESET)
@@ -54,7 +56,7 @@ def battle(enemy: Zombie, hero: Hero):
     print(f"End of the battle")
 
 
-def inventory(hero: Hero):
+def show_inventory(hero: Player):
     c = input("What to do?\n1) Use weapon\n2) Weapon list\n3) Use armor\n4) Armor list \n")
     if c == '1':
         for i in range(len(hero.hero_weapon_inventory)):
@@ -76,8 +78,8 @@ def inventory(hero: Hero):
             print(f"{i + 1}) ", hero.hero_armor_inventory[i].name, hero.hero_armor_inventory[i].durability)
 
 
-def welcome(hero: Hero):
-    print(Style.BLACK + f"Hello Hero, welcome in RPG world\nHere is your stick and Shkura\nGood luck ☘")
+def show_greeting(hero: Player):
+    print(Style.BLACK + f"Hello Hero, welcome in our RPG world\nHere is your stick and Shkura\nGood luck ☘")
     hero.name = input("Enter your name\n")
     hero.add_to_inventory(Weapon(1.5, "Stick"))
-    hero.add_to_inventory(Armor(1.5, "Shkura"))
+    hero.add_to_inventory(Outfit(1.5, "Shkura"))

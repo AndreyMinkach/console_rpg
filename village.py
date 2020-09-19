@@ -1,21 +1,21 @@
 from actions import *
 
 
-def sleap(hero: Hero):
-    agree = input("Sleap heal you to max health\nCoast for sleap - 1 gold\n1) +\n2) -\n")
-    if hero.gold < 1:
-        print("Not enought money")
+def sleep(player: Player):
+    agree = input("Sleep heal you to max health\nCoast for sleep - 1 gold\n1) +\n2) -\n")
+    if player.gold < 1:
+        print("Not enough money")
     elif agree == "1" or "+":
-        hero.gold -= 1
-        hero.health = hero.total_health
-        hero.short_info()
+        player.gold -= 1
+        player.health = player.total_health
+        player.short_info()
     elif agree == "2" or "-":
         return 1
     else:
         print(Style.RED + "Wrong input")
 
 
-def shop(hero: Hero):
+def shop(hero: Player):
     what_to_buy = int(input("What do you want to buy\n"
                             "1) Knife - 10 gold, 3 - damage\n"
                             "2) Sword - 20 gold 6 - damage\n"
@@ -31,5 +31,5 @@ def shop(hero: Hero):
         hero.add_to_inventory(Weapon(10, "Battle Axe"))
         print("Congrat, you buy the Battle Axe :)")
     else:
-        print("Dont have enought money")
+        print("Don not have enough money")
 

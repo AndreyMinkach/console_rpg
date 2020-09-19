@@ -1,5 +1,7 @@
 import math
-from items import *
+
+from Items.Outfits.outfit import Outfit
+from Items.Weapons.weapon import Weapon
 from const import *
 
 
@@ -18,7 +20,7 @@ class Creature:
         self.name = name
         self.total_damage = self.strength + Weapon().damage
         self.Weapon = Weapon()
-        self.Armor = Armor()
+        self.Armor = Outfit()
 
     def check_lvl(self):
         if self.experience >= arr_exp_for_next_lvl[self.lvl]:
@@ -60,23 +62,3 @@ class Creature:
               "\nLevel:", self.lvl,
               f"(exp: {round(self.experience/arr_exp_for_next_lvl[self.lvl] * 100)}%)" + Style.RESET)
 
-
-class Hero(Creature):
-    hero_weapon_inventory = []
-    hero_armor_inventory = []
-
-    def add_to_inventory(self, item):
-        if type(item) == Weapon:
-            self.hero_weapon_inventory.append(item)
-        elif type(item) == Armor:
-            self.hero_armor_inventory.append(item)
-
-    def skill_heal(self):
-        self.health += self.strength * 0.75
-        print(f"Heroes health encrease {self.health}")
-
-
-class Zombie(Creature):
-    def skill_increase_damage(self):
-        self.strength += 1
-        print(f"Zombies damage encrease {self.strength}")
