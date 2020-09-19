@@ -1,15 +1,13 @@
 import colorama
-import matplotlib.pyplot as plt
 
 
-def my_prog(first_el, power, count):
-    ele_before = first_el
-    arr = list()
-    arr.append(ele_before)
+def generate_geometric_progression(initial_value, power, count):
+    previous_value = initial_value
+    result_list = [previous_value]
     for i in range(count + 1):
-        arr.append(round(ele_before * power, 2))
-        ele_before = ele_before * power
-    return arr
+        result_list.append(round(previous_value * power, 2))
+        previous_value = previous_value * power
+    return result_list
 
 
 class Style:
@@ -42,7 +40,7 @@ colorama.init()
 
 d, f, n = 10, 1, 5  # degree, first element, number
 a = [i for i in range(12)]
-arr_exp_for_next_lvl = (my_prog(1000, 1.4, 10))
+arr_exp_for_next_lvl = (generate_geometric_progression(1000, 1.4, 10))
 
 # print(my_prog(10, 1.7, 1))
 # print(my_prog(10, 3.4, 0.02))
