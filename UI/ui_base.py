@@ -1,23 +1,17 @@
-import pygame
+from pygame import Surface
+from Helpers.location_helper import Vector2
 
 
-class UIBase(pygame.Surface):
-    def __init__(self, position_x, position_y, size_x, size_y):
-        super(UIBase, self).__init__((size_x, size_y))
-        self.position_x = position_x
-        self.position_y = position_y
-        self.size_x = size_x
-        self.size_y = size_y
+class UIBase(Surface):
+    def __init__(self, position: Vector2, size: Vector2):
+        super().__init__((size.x, size.y))
+        self.position = position
+        self.size = size
         self.enabled = True
         self.children = []
+        self.parent = None
 
-    def get_position(self):
-        return self.position_x, self.position_y
-
-    def get_size(self):
-        return self.size_x, self.size_y
-
-    def update(self, display_canvas: pygame.Surface):
+    def update(self, display_canvas: Surface):
         """
         Updates the calling abject and all its children
         :param display_canvas:
@@ -26,8 +20,13 @@ class UIBase(pygame.Surface):
         if self.enabled:
             for child in self.children:
                 if child is UIBase:
-                    self.blit(child, (child.position_x, child.position_y))
-            display_canvas.blit(self, (self.position_x, self.position_y))
+                    self.blit(child, (child.position.x, child.position.y))
+            display_canvas.blit(self, (self.position.x, self.position.y))
+
+    def is_point_inside(self, point: Vector2):
+        lu_corner = self.position if self.parent is None else self.position - self.parent.position
+        rb_corner = lu_corner + self.size
+        return lu_corner.x <= point.x <= rb_corner.x and lu_corner.y <= point.y <= rb_corner.y
 
     def fade_in(self):
         super().set_alpha(100)
