@@ -1,26 +1,40 @@
-from village import *
-from const import *
+import pygame
+import pygame.gfxdraw
+import configs
+from Helpers.color_helper import *
+from UI.renderer import *
 
-h = Player(1, "Hero", 0, 0, 1)
-show_greeting(h)
-while 1:
-    choose = input(Style.BLACK + "What do you want?\n"
-                                "1) Find adventures ⚔\n"
-                                "2) Village 🏠\n"
-                                "3) Hero stat 🦾\n"
-                                "4) Inventory 💼\n")
-    if choose == "1":
-        adventure(h)
-    elif choose == "2":
-        village_choose = input("What do you want?\n1) Shop\n2) Sleep\n")
-        if village_choose == "1":
-            shop(h)
-        elif village_choose == "2":
-            sleep(h)
-    elif choose == "3":
-        h.information()
-    elif choose == "4":
-        show_inventory(h)
-    else:
-        print(Style.RED + "Wrong input")
-        choose
+clock = pygame.time.Clock()
+renderer = Renderer()
+
+
+def main():
+    pygame.init()
+    pygame.display.set_caption(configs.WINDOW_TITLE)
+    screen = pygame.display.set_mode((configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT))
+    display_canvas = pygame.Surface((configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT))  # holds each ui object
+
+    temp_ui_1 = UIBase(200, 20, 50, 50)
+    temp_ui_1.fill(ColorHelper.LIGHT_BLUE)
+    temp_ui_2 = UIBase(400, 20, 50, 50)
+    temp_ui_2.fill(ColorHelper.YELLOW)
+    renderer.add_ui_object(temp_ui_1)
+    renderer.add_ui_object(temp_ui_2)
+
+    while True:
+        screen.fill(ColorHelper.WHITE)
+        display_canvas.fill(ColorHelper.DARK)
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                return
+
+        renderer.update(display_canvas)
+
+        screen.blit(display_canvas, (0, 0))
+        pygame.display.update()
+        clock.tick(configs.DESIRED_FPS)
+
+
+if __name__ == "__main__":
+    main()
