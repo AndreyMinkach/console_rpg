@@ -1,4 +1,7 @@
 from pygame import Surface
+
+from Animation.number_field_animation import NumberFieldAnimation
+from Animation.storyboard import Storyboard
 from Helpers.location_helper import Vector2
 
 
@@ -10,6 +13,16 @@ class UIBase(Surface):
         self.enabled = True
         self.children = []
         self.parent = None
+        self._opacity = 255
+
+    @property
+    def opacity(self):
+        return self._opacity
+
+    @opacity.setter
+    def opacity(self, value: int):
+        self._opacity = value
+        self.set_alpha(value)
 
     def update(self, display_canvas: Surface):
         """
@@ -28,5 +41,10 @@ class UIBase(Surface):
         rb_corner = lu_corner + self.size
         return lu_corner.x <= point.x <= rb_corner.x and lu_corner.y <= point.y <= rb_corner.y
 
-    def fade_in(self):
-        super().set_alpha(100)
+    def fade_in(self, duration: float):
+        Storyboard.instance.begin_animation(NumberFieldAnimation(self, 'opacity', 0, 255, duration))
+
+    def fade_out(self, duration: float):
+        Storyboard.instance.begin_animation(NumberFieldAnimation(self, 'opacity', 0, 255, duration))
+
+

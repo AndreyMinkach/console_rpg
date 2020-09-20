@@ -22,6 +22,7 @@ for section, commands in templates.items():
 clock = pygame.time.Clock()
 renderer = Renderer()
 event_helper = EventHelper()
+storyboard = Storyboard()
 
 
 def main():
@@ -58,6 +59,8 @@ def main():
     temp_scroll_container.add_child(temp_child_3)
     temp_scroll_container.add_child(temp_child_4)
 
+    temp_ui_1.fade_in(7)
+
     renderer.add_ui_object(temp_ui_1)
     renderer.add_ui_object(temp_ui_2)
     renderer.add_ui_object(temp_scroll_container)
@@ -67,6 +70,7 @@ def main():
         display_canvas.fill(ColorHelper.DARK)
 
         event_helper.update()
+        storyboard.update()
 
         renderer.update(display_canvas)
         screen.blit(display_canvas, (0, 0))
