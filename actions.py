@@ -80,6 +80,5 @@ def show_inventory(hero: Player):
 
 def show_greeting(hero: Player):
     print(Style.BLACK + f"Hello Hero, welcome in our RPG world\nHere is your stick and Shkura\nGood luck ☘")
-    hero.name = input("Enter your name\n")
     hero.add_to_inventory(Weapon(1.5, "Stick"))
     hero.add_to_inventory(Outfit(1.5, "Shkura"))

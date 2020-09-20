@@ -1,4 +1,6 @@
 from Creatures.creature import Creature
+from Items.Outfits.outfit import Outfit
+from Items.Weapons.weapon import Weapon
 
 
 class Player(Creature):
@@ -8,7 +10,7 @@ class Player(Creature):
     def add_to_inventory(self, item):
         if type(item) == Weapon:
             self.hero_weapon_inventory.append(item)
-        elif type(item) == Armor:
+        elif type(item) == Outfit:
             self.hero_armor_inventory.append(item)
 
     def skill_heal(self):
