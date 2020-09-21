@@ -13,7 +13,7 @@ class EventHelper:
         self.should_quit = False
 
     def update(self):
-        self.input_helper.mouse_wheel_delta = 0
+        self.input_helper.reset_input_fields()
         self.input_helper.mouse_position = Vector2(*pygame.mouse.get_pos())
 
         for e in pygame.event.get():
