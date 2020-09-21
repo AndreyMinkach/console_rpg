@@ -1,23 +1,12 @@
+from pydoc import locate
+
 import configs
 from Helpers.color_helper import ColorHelper
 from Helpers.window_event_helper import EventHelper
+from Items.items_loader import LoadJson
 from UI.renderer import *
 from UI.ui_scrollable_container import ScrollableContainer
-from UI.ui_text import UIText
-from Creatures.player import *
-import actions
-import json
 
-with open('Statik/Items/weapons.json') as f:
-    templates = json.load(f)
-
-
-for i in templates['weapons']:
-
-    print(i['name'], i['damage'])
-
-for section, commands in templates.items():
-    print(section)
 
 clock = pygame.time.Clock()
 renderer = Renderer()
@@ -26,6 +15,7 @@ storyboard = Storyboard()
 
 
 def main():
+    print(LoadJson().get_item_by_id(1))
     pygame.init()
     pygame.display.set_caption(configs.WINDOW_TITLE)
     screen = pygame.display.set_mode((configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT))
@@ -38,13 +28,6 @@ def main():
 
     temp_scroll_container = ScrollableContainer(Vector2(20, 50), Vector2(80, 200))
     temp_scroll_container.children_margin = Vector2(10, 10)
-
-    player = Player(1, "Hero", 1, 100, 1)
-    actions.show_greeting(player)
-    for i in player.hero_armor_inventory + player.hero_weapon_inventory:
-        text_ui_1 = UIText(Vector2.zero, Vector2(100, 20), i.name, 25, (0, 180, 0))
-        print(i.name)
-        temp_scroll_container.add_child(text_ui_1)
 
     temp_child_1 = UIBase(Vector2.zero, Vector2(30, 30))
     temp_child_1.fill(ColorHelper.LIGHT_BLUE)

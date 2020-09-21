@@ -1,0 +1,21 @@
+[{
+  "item_type": "Weapon",
+  "sub_type": "Sword",
+  "name": "Wooden Sword",
+  "damage": 6,
+  "id": 0
+},
+{
+  "item_type": "Weapon",
+  "sub_type": "Sword",
+  "name": "Iron Sword",
+  "damage": 8,
+  "id": 1
+},
+{
+  "item_type": "Weapon",
+  "sub_type": "Sword",
+  "name": "Silver Broadsword",
+  "damage": 10,
+  "id": 2
+}]
