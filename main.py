@@ -6,6 +6,18 @@ from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_text import UIText
 from Creatures.player import *
 import actions
+import json
+
+with open('Statik/Items/weapons.json') as f:
+    templates = json.load(f)
+
+
+for i in templates['weapons']:
+
+    print(i['name'], i['damage'])
+
+for section, commands in templates.items():
+    print(section)
 
 clock = pygame.time.Clock()
 renderer = Renderer()

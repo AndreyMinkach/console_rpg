@@ -1,0 +1,46 @@
+{
+    "weapons": [
+        {
+            "damage": 6,
+            "name": "Wooden Sword",
+			"weapon_type": "Sword",
+			"id": 0
+        },
+        {
+            "damage": 8,
+            "name": "Iron Sword",
+			"weapon_type": "Sword",
+			"id": 1
+        },
+        {
+            "damage": 11,
+            "name": "Silver Broadsword",
+			"weapon_type": "Sword",
+			"id": 2
+        },
+        {
+            "damage": 15,
+            "name": "Platinum Broadsword",
+			"weapon_type": "Sword",
+			"id": 3
+        },
+        {
+            "damage": 16,
+            "name": "Katana",
+			"weapon_type": "Sword",
+			"id": 4
+        },
+        {
+            "damage": 20,
+            "name": "Muramasa",
+			"weapon_type": "Sword",
+			"id": 5
+        },
+        {
+            "damage": 20,
+            "name": "Phaseblade",
+			"weapon_type": "Sword",
+			"id": 6
+        }
+    ]
+}
