@@ -32,4 +32,3 @@ def shop(hero: Player):
         print("Congrat, you buy the Battle Axe :)")
     else:
         print("Don not have enough money")
-

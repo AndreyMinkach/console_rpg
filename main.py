@@ -3,10 +3,8 @@ from pydoc import locate
 import configs
 from Helpers.color_helper import ColorHelper
 from Helpers.window_event_helper import EventHelper
-from Items.items_loader import LoadJson
 from UI.renderer import *
 from UI.ui_scrollable_container import ScrollableContainer
-
 
 clock = pygame.time.Clock()
 renderer = Renderer()
@@ -15,7 +13,6 @@ storyboard = Storyboard()
 
 
 def main():
-    print(LoadJson().get_item_by_id(1))
     pygame.init()
     pygame.display.set_caption(configs.WINDOW_TITLE)
     screen = pygame.display.set_mode((configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT))

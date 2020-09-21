@@ -1,42 +1,44 @@
-[{
-  "item_type": "Outfit",
-  "sub_type": "Helmet",
-  "name": "Wood Helmet",
-  "defence":  1,
-  "id": 50
-},
-{
-  "item_type": "Outfit",
-  "sub_type": "Shirt",
-  "name": "Wood Breastplate",
-  "defence":  1,
-  "id": 51
-},
-{
-  "item_type": "Outfit",
-  "sub_type": "Pants",
-  "name": "Wood Greaves",
-  "defence":  1,
-  "id": 52
-},
-{
-  "item_type": "Outfit",
-  "sub_type": "Helmet",
-  "name": "Silver Helmet",
-  "defence":  3,
-  "id": 53
-},
-{
-  "item_type": "Outfit",
-  "sub_type": "Shirt",
-  "name": "Silver Chainmail",
-  "defence":  4,
-  "id": 54
-},
-{
-  "item_type": "Outfit",
-  "sub_type": "Pants",
-  "name": "Silver Greaves",
-  "defence":  3,
-  "id": 55
-}]
+[
+  {
+    "item_type": "Outfit",
+    "sub_type": "Helmet",
+    "name": "Wood Helmet",
+    "defence": 1,
+    "id": 50
+  },
+  {
+    "item_type": "Outfit",
+    "sub_type": "Shirt",
+    "name": "Wood Breastplate",
+    "defence": 1,
+    "id": 51
+  },
+  {
+    "item_type": "Outfit",
+    "sub_type": "Pants",
+    "name": "Wood Greaves",
+    "defence": 1,
+    "id": 52
+  },
+  {
+    "item_type": "Outfit",
+    "sub_type": "Helmet",
+    "name": "Silver Helmet",
+    "defence": 3,
+    "id": 53
+  },
+  {
+    "item_type": "Outfit",
+    "sub_type": "Shirt",
+    "name": "Silver Chainmail",
+    "defence": 4,
+    "id": 54
+  },
+  {
+    "item_type": "Outfit",
+    "sub_type": "Pants",
+    "name": "Silver Greaves",
+    "defence": 3,
+    "id": 55
+  }
+]

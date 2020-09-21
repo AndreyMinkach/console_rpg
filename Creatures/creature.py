@@ -60,5 +60,4 @@ class Creature:
               "\nArmor:", self.Armor.name, ", durability ", self.Armor.durability, Style.YELLOW + Style.UNDERLINE +
               "\nGold:", self.gold,
               "\nLevel:", self.lvl,
-              f"(exp: {round(self.experience/arr_exp_for_next_lvl[self.lvl] * 100)}%)" + Style.RESET)
-
+              f"(exp: {round(self.experience / arr_exp_for_next_lvl[self.lvl] * 100)}%)" + Style.RESET)
