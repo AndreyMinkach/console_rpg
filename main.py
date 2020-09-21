@@ -1,5 +1,3 @@
-from pydoc import locate
-
 import configs
 from Helpers.color_helper import ColorHelper
 from Helpers.window_event_helper import EventHelper
