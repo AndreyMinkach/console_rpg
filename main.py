@@ -49,6 +49,11 @@ def main():
 
     temp_ui_1.fade_in(7)
 
+    temp_ui_2.on_mouse_enter = lambda o: o.fill(ColorHelper.LIGHT_BLUE)
+    temp_ui_2.on_mouse_leave = lambda o: o.fill(ColorHelper.YELLOW)
+    temp_ui_2.on_click_down = lambda o, b: o.fill(ColorHelper.GREEN)
+    temp_ui_2.on_click_up = lambda o, b: o.fill(ColorHelper.PINK)
+
     renderer.add_ui_object(temp_ui_1)
     renderer.add_ui_object(temp_ui_2)
     renderer.add_ui_object(temp_scroll_container)
