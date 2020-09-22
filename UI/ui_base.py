@@ -59,14 +59,14 @@ class UIBase(Surface):
                     self._is_mouse_inside = False
                     self.on_mouse_leave(self)
 
-            self.update_click_event(self.on_click_down, pygame.MOUSEBUTTONDOWN)
-            self.update_click_event(self.on_click_up, pygame.MOUSEBUTTONUP)
+            self.update_click_event(self.on_click_down, pygame.MOUSEBUTTONDOWN, mouse_pos)
+            self.update_click_event(self.on_click_up, pygame.MOUSEBUTTONUP, mouse_pos)
 
-    def update_click_event(self, click_lambda, click_type):
+    def update_click_event(self, click_lambda, click_type, mouse_pos: Vector2):
         if click_lambda is not None and isinstance(click_lambda, types.LambdaType):
             button = InputHelper.instance.current_mouse_button
             current_click_type = InputHelper.instance.current_click_type
-            if button != -1 and current_click_type == click_type:
+            if button != -1 and current_click_type == click_type and self.is_point_inside(mouse_pos):
                 click_lambda(self, button)
 
     def is_point_inside(self, point: Vector2):
