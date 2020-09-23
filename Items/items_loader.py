@@ -1,9 +1,6 @@
 import json
 from pydoc import locate
 
-from Items.Outfits.outfit import Outfit
-from Items.Weapons.weapon import Weapon
-
 
 class LoadJson:
     ITEM_TYPE_LIST = ['Items.Weapons.weapon.Weapon', 'Items.Outfits.outfit.Outfit']
