@@ -2,6 +2,7 @@ import configs
 from Gameplay.Quests.quest_manager import QuestManager
 from Helpers.color_helper import ColorHelper
 from Helpers.window_event_helper import EventHelper
+from Items.items_loader import ItemLoader
 from UI.renderer import *
 from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_text import UIText
@@ -11,6 +12,7 @@ renderer = Renderer()
 event_helper = EventHelper()
 storyboard = Storyboard()
 
+item_loader = ItemLoader()
 quest_manager = QuestManager()
 
 
