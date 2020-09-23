@@ -48,8 +48,9 @@ def wrap_multi_line(text, font, maxwidth):
 
 
 class UIText(UIBase):
-    def __init__(self, position: Vector2, size: Vector2, text: str, foreground=(int, int, int), font_size: int = 16):
-        self.font = 'serif'
+    def __init__(self, position: Vector2, size: Vector2, text: str, foreground=(int, int, int), font_size: int = 20,
+                 font_name: str = 'serif'):
+        self.font = font_name
         self.font_obj = pygame.font.SysFont(self.font, font_size)
         line_list = wrapline(text, self.font_obj, size.x)
         super().__init__(position, Vector2(size.x, len(line_list) * font_size))
@@ -59,7 +60,7 @@ class UIText(UIBase):
         self.foreground = foreground
         self._text = text
         for line in line_list:
-            self.children.append(self.font_obj.render(line, 1, self.foreground))
+            self.children.append(self.font_obj.render(line, 0, self.foreground))
 
     def update(self, display_canvas: UIBase):
         for i in range(len(self.children)):

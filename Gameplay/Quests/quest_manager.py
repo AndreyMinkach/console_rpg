@@ -1,5 +1,7 @@
+import json
+import os
+import warnings
 import enum
-from Gameplay.Quests.quest_loader import QuestLoader
 
 
 class QuestStatus(enum.Enum):
@@ -9,22 +11,118 @@ class QuestStatus(enum.Enum):
     Failed = 3
 
 
+class QuestStage:
+    def __init__(self):
+        self.activator = None
+
+    def update(self):
+        return QuestManager.instance.get_quest_variable(self.activator) is True
+
+
+class Quest:
+    def __init__(self):
+        self.status = QuestStatus.Inactive
+        self.activator = None
+        self.stages = []
+        self._current_stage = None
+        self._current_stage_index = -1
+
+    def select_next_stage(self):
+        self._current_stage_index += 1
+        if self._current_stage_index >= len(self.stages):
+            self.status = QuestStatus.Completed
+            return
+        self._current_stage = self.stages[self._current_stage_index]
+
+    def update(self):
+        if self._current_stage.update() is True:
+            self.select_next_stage()
+
+
 class QuestManager:
     instance = None
+    quest_json_verify_pattern = {"id": str, "variables": list, "activator": str, "required_level": int, "stages": list}
 
-    def __int__(self):
+    def __init__(self):
         self.__class__.instance = self
-        self._quest_list = []
+        # this list contains active user quests, which the manager should update every frame
+        self._active_quest_list = []
+        # this list contains completed or failed quest ids
+        self._completed_quest_list = []
         # contains global quests' variables (variable name is a key, value is some object(preferred boolean))
         self._quest_variables = {}
         # contains the information about by which variable some quest or quest stage should be activated
         # variable is a key, quest/quest stage is a value
-        self._quest_variables_function = {}
+        self._quest_variable_functions = {}
+        self._quests_dictionary = {}
+        # loads quests data from json files
+        self._load_quests_from_json()
+
+    def _load_quests_from_json(self):
+        folder_path = 'Static/Quests/'
+        file_list = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.json')]
+        for f in file_list:
+            with open(f, 'r') as temp_file:
+                temp_json = json.load(temp_file)
+                for quest_dict in temp_json:
+                    match_result, failure_reason = self.verify_dictionary_with_pattern(quest_dict)
+                    if match_result is False:
+                        warnings.warn(
+                            f"The dictionary '{quest_dict}' in file '{f}' is invalid, the reason is {failure_reason}")
+                        continue
+                    quest_object = Quest()
+                    quest_object.__dict__.update(quest_dict)
+                    self._quests_dictionary[quest_dict['id']] = quest_object
+
+                    self.add_quest_variables_from_list(quest_dict['variables'])
+                    self._quest_variable_functions[quest_dict['activator']] = quest_dict['id']
+                    quest_object.stages = []
+                    for stage_dict in quest_dict['stages']:
+                        quest_stage = QuestStage()
+                        quest_stage.__dict__.update(stage_dict)
+                        quest_object.stages.append(quest_stage)
+                        self._quest_variables[quest_stage.activator] = False
+
+    def get_quest_by_id(self, quest_id: str):
+        return self._quests_dictionary[quest_id]
 
     def start_quest(self, quest_id: str):
-        quest = QuestLoader.instance.get_quest_by_id(quest_id)
+        quest = self.get_quest_by_id(quest_id)
         quest.select_next_stage()
         quest.status = QuestStatus.Active
+        self._active_quest_list.append(quest)
 
-    def set_quest_variable(self, key: str,  value):
+    def update(self):
+        completed_quest_list = []
+        for quest in self._active_quest_list:
+            quest.update()
+            if quest.status == QuestStatus.Completed:
+                completed_quest_list.append(quest)
+
+        for quest in completed_quest_list:
+            self._active_quest_list.remove(quest)
+            self._completed_quest_list.append(quest)
+
+    def set_quest_variable(self, key: str, value):
         self._quest_variables[key] = value
+        if key in self._quest_variable_functions.keys():
+            self.start_quest(self._quest_variable_functions[key])
+
+    def get_quest_variable(self, key: str):
+        return self._quest_variables[key]
+
+    def add_quest_variables_from_list(self, variable_list: list):
+        for variable in variable_list:
+            self._quest_variables[variable] = False
+
+    def verify_dictionary_with_pattern(self, json_to_verify: dict):
+        json_items = list(json_to_verify.items())
+        pattern_items = list(self.quest_json_verify_pattern.items())
+        for i in range(len(pattern_items)):
+            json_pair = json_items[i]
+            pattern_pair = pattern_items[i]
+            if json_pair[0] != pattern_pair[0]:
+                return False, f"bad name of key: is '{json_pair[0]}', must be '{pattern_pair[0]}'"
+            if not isinstance(json_pair[1], pattern_pair[1]):
+                return False, f"bad type of value: is '{type(json_pair[1])}', must be '{type(pattern_pair[1])}'"
+        return True, None

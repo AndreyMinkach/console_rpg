@@ -1,44 +1,59 @@
 [
   {
     "id": "my_temp_quest",
-    "variables": ["temp_quest_start_condition", "some_other_variable"],
+    "variables": [
+      "temp_quest_start_condition",
+      "some_other_variable"
+    ],
     "activator": "temp_quest_start_condition",
     "required_level": 0,
-    "stages": ["first", "second"]
+    "stages": [
+      {
+        "id": 0,
+        "activator": "some_activator1"
+      },
+      {
+        "id": 1,
+        "activator": "some_activator2"
+      }
+    ]
   },
   {
     "id": "my_temp_quest1",
-    "variables": ["temp_quest_start_condition1", "some_other_variable1"],
+    "variables": [
+      "temp_quest_start_condition1",
+      "some_other_variable1"
+    ],
     "activator": "temp_quest_start_condition1",
     "required_level": 0,
-    "stages": ["first", "second"]
+    "stages": [
+      {
+        "id": 0,
+        "activator": "some_activator3"
+      },
+      {
+        "id": 1,
+        "activator": "some_activator4"
+      }
+    ]
   },
   {
     "id": "my_temp_quest2",
-    "variables": ["temp_quest_start_condition2", "some_other_variable2"],
+    "variables": [
+      "temp_quest_start_condition2",
+      "some_other_variable2"
+    ],
     "activator": "temp_quest_start_condition2",
     "required_level": 0,
-    "stages": ["first", "second"]
-  },
-  {
-    "id": "my_temp_quest3",
-    "variables": ["temp_quest_start_condition3", "some_other_variable3"],
-    "activator": "temp_quest_start_condition3",
-    "required_level": 0,
-    "stages": ["first", "second"]
-  },
-  {
-    "id": "my_temp_quest4",
-    "variables": ["temp_quest_start_condition4", "some_other_variable4"],
-    "activator": "temp_quest_start_condition4",
-    "required_level": 0,
-    "stages": ["first", "second"]
-  },
-  {
-    "id": "my_temp_quest5",
-    "variables": ["temp_quest_start_condition5", "some_other_variable5"],
-    "activator": "temp_quest_start_condition5",
-    "required_level": 0,
-    "stages": ["first", "second"]
+    "stages": [
+      {
+        "id": 0,
+        "activator": "some_activator5"
+      },
+      {
+        "id": 1,
+        "activator": "some_activator6"
+      }
+    ]
   }
 ]
