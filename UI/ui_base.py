@@ -43,7 +43,7 @@ class UIBase(Surface):
         """
         if self.enabled:
             for child in self.children:
-                if child is UIBase:
+                if isinstance(child, UIBase):
                     self.blit(child, (child.position.x, child.position.y))
             display_canvas.blit(self, (self.position.x, self.position.y))
 

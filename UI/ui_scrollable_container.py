@@ -53,4 +53,5 @@ class ScrollableContainer(UIBase):
         is_cursor_inside = self.is_point_inside(mouse_pos)
         if is_cursor_inside:
             self._vertical_offset += InputHelper.instance.mouse_wheel_delta * self._offset_value
-            self._vertical_offset = max(self.size.y - self._viewer_extent.y, min(self._vertical_offset, 0))
+            self._vertical_offset = max(min(0, self.size.y - self._viewer_extent.y - self.children_margin.y),
+                                        min(self._vertical_offset, 0))
