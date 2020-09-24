@@ -5,6 +5,7 @@ from pygame import Surface
 
 from Animation.number_field_animation import NumberFieldAnimation
 from Animation.storyboard import Storyboard
+from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 

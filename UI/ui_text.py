@@ -1,61 +1,51 @@
-import time
-
-import pygame
-
 from Helpers.color_helper import ColorHelper
 from UI.ui_base import *
-from itertools import chain
 
 
-def truncline(text, font, maxwidth):
+def trunc_line(text, font, max_width):
     real = len(text)
-    stext = text
+    s_text = text
     l = font.size(text)[0]
     cut = 0
     a = 0
     done = 1
     old = None
-    while l > maxwidth:
+    while l > max_width:
         a = a + 1
         n = text.rsplit(None, a)[0]
-        if stext == n:
+        if s_text == n:
             cut += 1
-            stext = n[:-cut]
+            s_text = n[:-cut]
         else:
-            stext = n
-        l = font.size(stext)[0]
-        real = len(stext)
+            s_text = n
+        l = font.size(s_text)[0]
+        real = len(s_text)
         done = 0
-    return real, done, stext
+    return real, done, s_text
 
 
-def wrapline(text, font, maxwidth):
+def wrap_line(text, font, max_width):
     done = 0
     wrapped = []
 
     while not done:
-        nl, done, stext = truncline(text, font, maxwidth)
-        wrapped.append(stext.strip())
+        nl, done, s_text = trunc_line(text, font, max_width)
+        wrapped.append(s_text.strip())
         text = text[nl:]
     return wrapped
 
 
-def wrap_multi_line(text, font, maxwidth):
-    """ returns text taking new lines into account.
-    """
-    lines = chain(*(wrapline(line, font, maxwidth) for line in text.splitlines()))
-    return list(lines)
-
-
 class UIText(UIBase):
-    def __init__(self, position: Vector2, size: Vector2, text: str, foreground=(int, int, int), font_size: int = 20,
-                 font_name: str = 'serif'):
-        self.font = font_name
-        self.font_obj = pygame.font.SysFont(self.font, font_size)
-        line_list = wrapline(text, self.font_obj, size.x)
+    def __init__(self, position: Vector2,
+                 size: Vector2,
+                 text: str,
+                 foreground: (int, int, int),
+                 font_size: int = 25,
+                 font_name: str = None):
+        self.font_name = font_name
+        self.font_obj = pygame.font.SysFont(self.font_name, font_size)
+        line_list = wrap_line(text, self.font_obj, size.x)
         super().__init__(position, Vector2(size.x, len(line_list) * font_size))
-
-        self.set_colorkey(ColorHelper.BLACK)
         self.font_size = font_size
         self.foreground = foreground
         self._text = text

@@ -4,6 +4,7 @@ from Helpers.color_helper import ColorHelper
 from Helpers.window_event_helper import EventHelper
 from UI.renderer import *
 from UI.ui_scrollable_container import ScrollableContainer
+from UI.ui_sprite import UIBase, UISprite
 from UI.ui_text import UIText
 
 clock = pygame.time.Clock()
@@ -37,11 +38,9 @@ def main():
         "на сервисе у вас будут расширены ограничения проверки, предназначенные для гостей, и вы получите возможность проверять гораздо большее количество текстов с помощью нашего сервиса плагиат онлайн.",
         "hello dude", "LOH"]
     temp_ui_dialog = ScrollableContainer(Vector2(100, 300), Vector2(760, 150))
-    temp_ui_dialog.children_margin = Vector2(10, 10)
-    for i in pygame.font.get_fonts():
-        temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30),
-                                        f"{i} Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                                        ColorHelper.GREEN, 20, i))
+    temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), dialog[0], ColorHelper.GREEN))
+    temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), dialog[1], ColorHelper.WHITE))
+    temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), dialog[2], ColorHelper.LIGHT_BLUE))
 
     temp_child_1 = UIBase(Vector2.zero, Vector2(30, 30))
     temp_child_1.fill(ColorHelper.LIGHT_BLUE)
@@ -56,6 +55,11 @@ def main():
     temp_scroll_container.add_child(temp_child_3)
     temp_scroll_container.add_child(temp_child_4)
 
+    temp_sprite = UISprite(Vector2(120, 120),
+                           r"UI\image.png",
+                           Vector2(120, 120), 0.2, 7, 0, 0)
+    renderer.add_ui_object(temp_sprite)
+
     temp_ui_1.fade_in(7)
 
     temp_ui_2.on_mouse_enter = lambda o: o.fill(ColorHelper.LIGHT_BLUE)
@@ -65,7 +69,6 @@ def main():
 
     temp_ui_3 = UIBase(Vector2(400, 100), Vector2(350, 150))
     temp_ui_3.fill(ColorHelper.PINK)
-
     temp_ui_4 = UIBase(Vector2(10, 10), Vector2(200, 50))
     temp_ui_4.fill(ColorHelper.GREEN)
     temp_ui_3.children.append(temp_ui_4)
@@ -73,6 +76,7 @@ def main():
     renderer.add_ui_object(temp_ui_1)
     renderer.add_ui_object(temp_ui_2)
     renderer.add_ui_object(temp_ui_3)
+
     renderer.add_ui_object(temp_scroll_container)
     renderer.add_ui_object(temp_ui_dialog)
 
