@@ -1,25 +1,19 @@
-import json
-import os
 from pydoc import locate
 
+from Helpers.json_loader import JsonLoader
 
-class ItemLoader:
+
+class ItemLoader(JsonLoader):
     ITEM_TYPE_LIST = ['Items.Weapons.weapon.Weapon', 'Items.Outfits.outfit.Outfit']
 
     def __init__(self):
+        super().__init__('Static/Items/')
         self._items = {}
         self.load_items()
 
     def load_items(self):
-        folder_path = 'Static/Items/'
-        file_list = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.json')]
-        items = {}
-        for file_path in file_list:
-            with open(file_path, 'r') as f:
-                temp_json = json.load(f)
-                for value_item in temp_json:
-                    items[value_item['id']] = value_item
-        self._items = items
+        for value_item in self.loaded_element_list:
+            self._items[value_item['id']] = value_item
 
     def get_item_by_id(self, item_id: int):
         if item_id not in list(self._items.keys()):
