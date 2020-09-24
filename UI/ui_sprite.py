@@ -1,6 +1,5 @@
 import time
 
-from Helpers.color_helper import ColorHelper
 from UI.ui_base import *
 
 
@@ -16,7 +15,6 @@ class UISprite(UIBase):
         try:
             self.sprite_size = sprite_size
             self.sheet = pygame.image.load(filename)
-            self.sheet
             self.sprite_count = sprite_count
             self.sprite_frame_time = sprite_frame_time
             self.when_change = float(time.time()) + self.sprite_frame_time
@@ -26,7 +24,6 @@ class UISprite(UIBase):
         except AttributeError:
             print(f"Unable to load sprite sheet image: {filename}")
         super().__init__(position, Vector2(self.sheet.get_size()[0], self.sheet.get_size()[1]))
-        self.fill(ColorHelper.PINK)
 
     def cut_image(self, rectangle, color_key: (int, int, int) = None):
         """Load a specific image from a specific rectangle."""
