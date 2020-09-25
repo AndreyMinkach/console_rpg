@@ -4,6 +4,7 @@ from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 from UI.ui_base import UIBase
+from UI.ui_text import UIText
 
 
 class ScrollableContainer(UIBase):
@@ -20,6 +21,14 @@ class ScrollableContainer(UIBase):
         child.parent = self
         self._children.append(child)
         self.calculate_viewer_extent()
+
+    def add_from_string_list(self, position: Vector2, size: Vector2, string_list: list,
+                             foreground: (int, int, int), font_size: int = 25, font_name: str = None):
+        for sting in string_list:
+            self.add_child(UIText(position, size, sting, foreground, font_size, font_name))
+
+    def clear_children(self):
+        self._children.clear()
 
     def remove_child(self, child: UIBase):
         child.parent = None
