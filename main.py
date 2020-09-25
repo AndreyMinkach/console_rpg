@@ -38,9 +38,7 @@ def main():
         "на сервисе у вас будут расширены ограничения проверки, предназначенные для гостей, и вы получите возможность проверять гораздо большее количество текстов с помощью нашего сервиса плагиат онлайн.",
         "hello dude", "LOH"]
     temp_ui_dialog = ScrollableContainer(Vector2(100, 300), Vector2(760, 150))
-    temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), dialog[0], ColorHelper.GREEN))
-    temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), dialog[1], ColorHelper.WHITE))
-    temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), dialog[2], ColorHelper.LIGHT_BLUE))
+    temp_ui_dialog.add_from_string_list(Vector2.zero, Vector2(760, 30), dialog, ColorHelper.GREEN)
 
     temp_child_1 = UIBase(Vector2.zero, Vector2(30, 30))
     temp_child_1.fill(ColorHelper.LIGHT_BLUE)
@@ -55,9 +53,7 @@ def main():
     temp_scroll_container.add_child(temp_child_3)
     temp_scroll_container.add_child(temp_child_4)
 
-    temp_sprite = UISprite(Vector2(120, 120),
-                           r"UI\image.png",
-                           Vector2(120, 120), 0.2, 7, 0, 0)
+    temp_sprite = UISprite(Vector2(120, 120), r"Static\Images\image.png", Vector2(120, 120), 0.2, 7, 0, 0)
     renderer.add_ui_object(temp_sprite)
 
     temp_ui_1.fade_in(7)

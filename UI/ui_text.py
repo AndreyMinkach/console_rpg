@@ -36,12 +36,8 @@ def wrap_line(text, font, max_width):
 
 
 class UIText(UIBase):
-    def __init__(self, position: Vector2,
-                 size: Vector2,
-                 text: str,
-                 foreground: (int, int, int),
-                 font_size: int = 25,
-                 font_name: str = None):
+    def __init__(self, position: Vector2, size: Vector2, text: str, foreground: (int, int, int),
+                 font_size: int = 25, font_name: str = None):
         self.font_name = font_name
         self.font_obj = pygame.font.SysFont(self.font_name, font_size)
         line_list = wrap_line(text, self.font_obj, size.x)

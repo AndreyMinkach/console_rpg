@@ -22,10 +22,10 @@ class ScrollableContainer(UIBase):
         self._children.append(child)
         self.calculate_viewer_extent()
 
-    def add_from_string_list(self, string_list: list):
-        print(string_list)
+    def add_from_string_list(self, position: Vector2, size: Vector2, string_list: list,
+                             foreground: (int, int, int), font_size: int = 25, font_name: str = None):
         for sting in string_list:
-            self.add_child((UIText(Vector2.zero, Vector2(760, 30), sting)))
+            self.add_child(UIText(position, size, sting, foreground, font_size, font_name))
 
     def clear_children(self):
         self._children.clear()
