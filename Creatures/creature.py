@@ -1,5 +1,6 @@
 import math
 
+from Gameplay.inventory import Inventory
 from Items.Outfits.outfit import Outfit
 from Items.Weapons.weapon import Weapon
 from const import *
@@ -21,6 +22,7 @@ class Creature:
         self.total_damage = self.strength + Weapon().damage
         self.Weapon = Weapon()
         self.Armor = Outfit()
+        self.inventory = Inventory()
 
     def check_lvl(self):
         if self.experience >= arr_exp_for_next_lvl[self.lvl]:

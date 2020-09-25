@@ -40,10 +40,8 @@ def main():
         "hello dude", "LOH"]
     temp_ui_dialog = ScrollableContainer(Vector2(100, 300), Vector2(760, 150))
     temp_ui_dialog.children_margin = Vector2(10, 10)
-    for i in pygame.font.get_fonts():
-        temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30),
-                                        f"{i} Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                                        ColorHelper.GREEN, 20, i))
+    for i in dialog:
+        temp_ui_dialog.add_child(UIText(Vector2.zero, Vector2(760, 30), i, ColorHelper.GREEN, 20, i))
 
     temp_child_1 = UIBase(Vector2.zero, Vector2(30, 30))
     temp_child_1.fill(ColorHelper.LIGHT_BLUE)

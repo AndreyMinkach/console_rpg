@@ -4,9 +4,11 @@ from Helpers.json_loader import JsonLoader
 
 
 class ItemLoader(JsonLoader):
+    instance = None
     ITEM_TYPE_LIST = ['Items.Weapons.weapon.Weapon', 'Items.Outfits.outfit.Outfit']
 
     def __init__(self):
+        self.__class__.instance = self
         super().__init__('Static/Items/')
         self._items = {}
         self.load_items()
