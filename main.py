@@ -1,39 +1,45 @@
 import pyglet
 from pyglet.window import key, mouse
-
-window = pyglet.window.Window(1280, 620)
-
-
-@window.event
-def on_activate():
-    window.set_caption("Not a console RPG")
-    window.set_vsync(True)
+from pyglet.gl import *
 
 
-@window.event
-def on_close():
-    print('close')
+class Triangle:
+    def __init__(self):
+        self.vertices = pyglet.graphics.vertex_list(3, ('v3f', [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0]),
+                                                    ('c3b', [100, 200, 220, 200, 110, 100, 100, 250, 100]))
 
 
-@window.event
-def on_key_press(symbol, modifiers):
-    if symbol == key.A:
-        print('A')
+triangle = Triangle()
 
 
-@window.event
-def on_mouse_press(x, y, button, modifiers):
-    print(f"({x, y}): {button}")
+class MyWindow(pyglet.window.Window):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_minimum_size(400, 300)
 
+    def on_activate(self):
+        self.set_caption("Not a console RPG")
+        self.set_vsync(True)
 
-@window.event
-def on_draw():
-    window.clear()
-    pyglet.graphics.draw(2, pyglet.gl.GL_POINTS,
-                         ('v2i', (10, 15, 30, 35))
-                         )
-    window.flip()
+    def on_close(self):
+        print('close')
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol == key.A:
+            print('A')
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        print(f"({x, y}): {button}")
+
+    def on_resize(self, width, height):
+        glViewport(0, 0, width, height)
+
+    def on_draw(self):
+        window.clear()
+        triangle.vertices.draw(GL_TRIANGLES)
+        # window.flip()
 
 
 if __name__ == '__main__':
+    window = MyWindow(1280, 620, caption="Not a console game", resizable=True)
     pyglet.app.run()
