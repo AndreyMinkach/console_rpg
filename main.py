@@ -6,11 +6,13 @@ from Items.items_loader import ItemLoader
 from UI.renderer import *
 from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_text import UIText
+from UI.ui_tooltip import UITooltip
 
 clock = pygame.time.Clock()
 renderer = Renderer()
 event_helper = EventHelper()
 storyboard = Storyboard()
+tooltip = UITooltip()
 
 item_loader = ItemLoader()
 quest_manager = QuestManager()
@@ -86,6 +88,7 @@ def main():
         quest_manager.update()
 
         renderer.update(display_canvas)
+        tooltip.update(display_canvas)
         screen.blit(display_canvas, (0, 0))
 
         pygame.display.update()

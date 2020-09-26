@@ -5,6 +5,9 @@ class Vector2:
         self.x = x
         self.y = y
 
+    def tuple(self) -> (int, int):
+        return self.x, self.y
+
     def __add__(self, other):
         return Vector2(self.x + other.x, self.y + other.y)
 

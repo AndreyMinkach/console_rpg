@@ -16,6 +16,9 @@ class NumberFieldAnimation:
     def start_animation(self):
         self.start_time = time.time()
 
+    def lerp(self, a: int, b: int, t: float) -> int:
+        return int(a + t * (b - a))
+
     def update(self):
         """
         Updates animation
