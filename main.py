@@ -2,6 +2,8 @@ import pyglet
 from pyglet.window import key, mouse
 from pyglet.gl import *
 
+import configs
+
 
 class Triangle:
     def __init__(self):
@@ -21,9 +23,6 @@ class MyWindow(pyglet.window.Window):
         self.set_caption("Not a console RPG")
         self.set_vsync(True)
 
-    def on_close(self):
-        print('close')
-
     def on_key_press(self, symbol, modifiers):
         if symbol == key.A:
             print('A')
@@ -35,11 +34,15 @@ class MyWindow(pyglet.window.Window):
         glViewport(0, 0, width, height)
 
     def on_draw(self):
+        glClearColor(255, 255, 255, 0)
         window.clear()
         triangle.vertices.draw(GL_TRIANGLES)
-        # window.flip()
+
+    def update(self, dt):
+        pass
 
 
 if __name__ == '__main__':
     window = MyWindow(1280, 620, caption="Not a console game", resizable=True)
+    pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()
