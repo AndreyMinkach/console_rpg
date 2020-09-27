@@ -1,7 +1,6 @@
 import types
 
-import pygame
-from pygame import Surface
+from pyglet.sprite import Sprite
 
 from Animation.number_field_animation import NumberFieldAnimation
 from Animation.storyboard import Storyboard
@@ -9,9 +8,9 @@ from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 
 
-class UIBase(Surface):
+class UIBase(Sprite):
     def __init__(self, position: Vector2, size: Vector2):
-        super().__init__((size.x, size.y))
+        super().__init__()
         self.position = position
         self.size = size
         self.enabled = True
