@@ -1,3 +1,5 @@
+import types
+
 import pyglet
 from pyglet.sprite import Sprite
 
@@ -11,6 +13,7 @@ class UIBase(Sprite):
         super().__init__(image, x=position.x, y=position.y)
         self.enabled = True
         self.children = []
+        self.children.append(self)
         self.parent = None
         self._opacity = 255
         self._is_mouse_inside = False
@@ -31,11 +34,11 @@ class UIBase(Sprite):
         self.set_alpha(value)
 
     def render(self):
+        print(self.children)
         if self.enabled:
             for child in self.children:
                 if isinstance(child, UIBase):
-                    self.blit(child, (child.position.x, child.position.y))
-            self.draw()
+                    self.draw()
 
             # update mouse events
             # mouse_pos = InputHelper.instance.mouse_position
