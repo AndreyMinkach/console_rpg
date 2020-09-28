@@ -8,8 +8,6 @@ from Helpers.location_helper import Vector2
 class UIBase(Sprite):
     def __init__(self, position: Vector2, size: Vector2):
         image = pyglet.image.SolidColorImagePattern(ColorHelper.WHITE).create_image(size.x, size.y)
-        image.height = size.x
-        image.width = size.y
         super().__init__(image, x=position.x, y=position.y)
         self.enabled = True
         self.children = []
@@ -53,3 +51,4 @@ class UIBase(Sprite):
             #
             # self.update_click_event(self.on_click_down, pygame.MOUSEBUTTONDOWN, mouse_pos)
             # self.update_click_event(self.on_click_up, pygame.MOUSEBUTTONUP, mouse_pos)
+
