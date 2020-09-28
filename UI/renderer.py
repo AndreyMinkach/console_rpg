@@ -1,4 +1,3 @@
-import pygame
 from UI.ui_base import *
 
 
@@ -12,6 +11,6 @@ class Renderer:
     def remove_ui_object(self, ui_object: UIBase):
         self._ui_objects_list.remove(ui_object)
 
-    def update(self, display_canvas: pygame.Surface):
+    def update(self):
         for child in self._ui_objects_list:
-            child.update(display_canvas)
+            child.update()

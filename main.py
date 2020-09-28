@@ -1,18 +1,17 @@
-import pyglet
-from pyglet.window import key, mouse
 from pyglet.gl import *
 
 import configs
+from Helpers.location_helper import Vector2
+from UI.renderer import Renderer
+from UI.ui_base import UIBase
+from UI.ui_text import UIText
 
 
 class MyWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
+        self.renderer = Renderer()
         super().__init__(*args, **kwargs)
         self.set_minimum_size(400, 300)
-        self.sprite1 = pyglet.sprite.Sprite(pyglet.resource.image('Static/Images/basic_white_image.png'), x=0, y=0)
-        self.sprite1.scale = 300 / self.sprite1.width
-        self.sprite2 = pyglet.sprite.Sprite(pyglet.resource.image('Static/Images/basic_white_image_2.png'), x=300, y=0)
-        self.sprite1.opacity = 255
 
     def on_activate(self):
         glClearColor(0.2, 0.2, 0.2, 0)
@@ -27,19 +26,21 @@ class MyWindow(pyglet.window.Window):
 
     def on_draw(self):
         self.clear()
-
-        # self.sprite2.scale += 0.01
-
-        self.sprite2.draw()
-
-        self.sprite1.draw()
+        self.renderer.update()
 
     def update(self, dt):
         pass
 
 
 if __name__ == '__main__':
-    window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
+
+    display_canvas = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
                       vsync=True)
-    pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
+
+    temp_ui_text1 = UIText(Vector2(100, 200), "Updates the callingpdates the calling abject and all its  Updates the calling abject and all itspdates the calling abject and all its  Updates the calling abject and all itspdates the calling abject and all its  Updates the calling abject and all its abject and all its  Updates the calling abject and all its ")
+
+    temp_base1 = UIBase(Vector2(0, 0), Vector2(200, 200))
+    display_canvas.renderer.add_ui_object(temp_ui_text1)
+    display_canvas.renderer.add_ui_object(temp_base1)
+    pyglet.clock.schedule_interval(display_canvas.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

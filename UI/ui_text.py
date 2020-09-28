@@ -1,7 +1,5 @@
 import time
 
-import pygame
-
 from Helpers.color_helper import ColorHelper
 from UI.ui_base import *
 from itertools import chain
@@ -48,21 +46,13 @@ def wrap_multi_line(text, font, maxwidth):
 
 
 class UIText(UIBase):
-    def __init__(self, position: Vector2, size: Vector2, text: str, foreground=(int, int, int), font_size: int = 20,
-                 font_name: str = 'serif'):
-        self.font = font_name
-        self.font_obj = pygame.font.SysFont(self.font, font_size)
-        line_list = wrapline(text, self.font_obj, size.x)
-        super().__init__(position, Vector2(size.x, len(line_list) * font_size))
+    def __init__(self, position: Vector2, labaa123: str):
+        document = pyglet.text.document.FormattedDocument(labaa123)
+        document.set_style(0, len(document.text), dict(color=(255, 255, 255, 255)))
+        text = pyglet.text.layout.TextLayout(document, 600, 200, multiline=True)
+        self.children = []
+        self.children.append(text)
 
-        self.set_colorkey(ColorHelper.BLACK)
-        self.font_size = font_size
-        self.foreground = foreground
-        self._text = text
-        for line in line_list:
-            self.children.append(self.font_obj.render(line, 0, self.foreground))
-
-    def update(self, display_canvas: UIBase):
-        for i in range(len(self.children)):
-            self.blit(self.children[i], (0, i * self.font_size))
-        display_canvas.blit(self, (self.position.x, self.position.y))
+    def update(self):
+        for c in self.children:
+            c.draw()
