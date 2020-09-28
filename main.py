@@ -1,3 +1,4 @@
+from pyglet import font
 from pyglet.gl import *
 
 import configs
@@ -42,6 +43,7 @@ if __name__ == '__main__':
                            "itspdates the calling abject and all its  Updates the calling abject and all its abject "
                            "and all its  Updates the calling abject and all its ",
                            Vector2(400, 200), Vector2(200, 0))
+
 
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200))
     renderer.add_ui_object(temp_ui_text1)

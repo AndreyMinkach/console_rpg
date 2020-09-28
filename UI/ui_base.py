@@ -34,7 +34,6 @@ class UIBase(Sprite):
         self.set_alpha(value)
 
     def update_and_draw(self):
-        print(self.children)
         if self.enabled:
             for child in self.children:
                 if isinstance(child, UIBase):
