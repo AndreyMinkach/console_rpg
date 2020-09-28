@@ -15,6 +15,6 @@ class UIText(UIBase):
         self.children = []
         self.children.append(text)
 
-    def render(self):
+    def update_and_draw(self):
         for c in self.children:
             c.draw()

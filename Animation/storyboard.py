@@ -20,7 +20,7 @@ class Storyboard:
 
     def update(self):
         for a in self._animations:
-            if a.render():
+            if a.update_and_draw():
                 self._animations_to_remove.append(a)
 
         for a in self._animations_to_remove:

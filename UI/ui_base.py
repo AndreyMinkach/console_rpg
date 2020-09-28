@@ -33,12 +33,13 @@ class UIBase(Sprite):
         self._opacity = value
         self.set_alpha(value)
 
-    def render(self):
+    def update_and_draw(self):
         print(self.children)
         if self.enabled:
             for child in self.children:
                 if isinstance(child, UIBase):
-                    self.draw()
+                    child.draw()
+            self.draw()
 
             # update mouse events
             # mouse_pos = InputHelper.instance.mouse_position

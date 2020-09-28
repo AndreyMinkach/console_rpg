@@ -16,4 +16,4 @@ class Renderer:
 
     def update(self):
         for child in self._ui_objects_list:
-            child.render()
+            child.update_and_draw()
