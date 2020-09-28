@@ -6,10 +6,11 @@ from UI.renderer import Renderer
 from UI.ui_base import UIBase
 from UI.ui_text import UIText
 
+renderer = Renderer()
+
 
 class MyWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
-        self.renderer = Renderer()
         super().__init__(*args, **kwargs)
         self.set_minimum_size(400, 300)
 
@@ -26,21 +27,21 @@ class MyWindow(pyglet.window.Window):
 
     def on_draw(self):
         self.clear()
-        self.renderer.update()
+        renderer.update()
 
     def update(self, dt):
         pass
 
 
 if __name__ == '__main__':
-
-    display_canvas = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
+    window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
                       vsync=True)
 
-    temp_ui_text1 = UIText(Vector2(100, 200), "Updates the callingpdates the calling abject and all its  Updates the calling abject and all itspdates the calling abject and all its  Updates the calling abject and all itspdates the calling abject and all its  Updates the calling abject and all its abject and all its  Updates the calling abject and all its ")
+    temp_ui_text1 = UIText(Vector2(100, 200),
+                           "Updates the calling pdates the calling abject and all its  Updates the calling abject and all its updates the calling abject and all its  Updates the calling abject and all itspdates the calling abject and all its  Updates the calling abject and all its abject and all its  Updates the calling abject and all its ")
 
     temp_base1 = UIBase(Vector2(0, 0), Vector2(200, 200))
-    display_canvas.renderer.add_ui_object(temp_ui_text1)
-    display_canvas.renderer.add_ui_object(temp_base1)
-    pyglet.clock.schedule_interval(display_canvas.update, 1.0 / float(configs.DESIRED_FPS))
+    renderer.add_ui_object(temp_ui_text1)
+    renderer.add_ui_object(temp_base1)
+    pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

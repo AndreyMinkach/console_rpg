@@ -2,7 +2,10 @@ from UI.ui_base import *
 
 
 class Renderer:
+    instance = None
+
     def __init__(self):
+        self.__class__.instance = self
         self._ui_objects_list = []
 
     def add_ui_object(self, ui_object: UIBase):
@@ -13,4 +16,4 @@ class Renderer:
 
     def update(self):
         for child in self._ui_objects_list:
-            child.update()
+            child.render()

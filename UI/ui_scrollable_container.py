@@ -34,8 +34,8 @@ class ScrollableContainer(UIBase):
             extent_y += child.size.y
         self._viewer_extent = Vector2(extent_x, extent_y + self.children_margin.y * child_number)
 
-    def update(self, display_canvas: Surface):
-        super().update(display_canvas)
+    def render(self, display_canvas: Surface):
+        super().render(display_canvas)
         self.fill(ColorHelper.BLACK)
         self._update_scroll()
 
@@ -45,7 +45,7 @@ class ScrollableContainer(UIBase):
             if isinstance(child, UIBase):
                 viewer_height += self.children_margin.y
                 child.position = Vector2(self.children_margin.x, viewer_height + self._vertical_offset)
-                child.update(self)
+                child.render(self)
                 viewer_height += child.size.y
 
     def _update_scroll(self):

@@ -33,5 +33,24 @@ class UIBase(Sprite):
         self._opacity = value
         self.set_alpha(value)
 
-    def update(self):
-        self.draw()
+    def render(self):
+        if self.enabled:
+            for child in self.children:
+                if isinstance(child, UIBase):
+                    self.blit(child, (child.position.x, child.position.y))
+            self.draw()
+
+            # update mouse events
+            # mouse_pos = InputHelper.instance.mouse_position
+            # if self.on_mouse_enter is not None and isinstance(self.on_mouse_enter, types.LambdaType):
+            #     if not self._is_mouse_inside and self.is_point_inside(mouse_pos):
+            #         self._is_mouse_inside = True
+            #         self.on_mouse_enter(self)
+            #
+            # if self.on_mouse_leave is not None and isinstance(self.on_mouse_leave, types.LambdaType):
+            #     if self._is_mouse_inside and not self.is_point_inside(mouse_pos):
+            #         self._is_mouse_inside = False
+            #         self.on_mouse_leave(self)
+            #
+            # self.update_click_event(self.on_click_down, pygame.MOUSEBUTTONDOWN, mouse_pos)
+            # self.update_click_event(self.on_click_up, pygame.MOUSEBUTTONUP, mouse_pos)

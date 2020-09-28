@@ -33,7 +33,7 @@ class UIInventory(UIBase):
         # main_window.children.append(my_invent_btn)
         #
 
-    def update(self, display_canvas: UIBase):
+    def render(self, display_canvas: UIBase):
         for ui_element in self.children:
             print(ui_element)
             self.blit(ui_element, (10, 10))

@@ -53,6 +53,6 @@ class UIText(UIBase):
         self.children = []
         self.children.append(text)
 
-    def update(self):
+    def render(self):
         for c in self.children:
             c.draw()
