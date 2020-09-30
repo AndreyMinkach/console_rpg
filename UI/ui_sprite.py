@@ -6,7 +6,7 @@ from UI.ui_base import *
 class UISprite(UIBase):
     def __init__(self, image_path: str, position: Vector2, size: Vector2, row: int, col: int, frame_number: int,
                  sprite_height: int, sprite_width: int):
-        super().__init__(position, size, transparent=False)
+        super().__init__(position, Vector2(sprite_width, sprite_height), transparent=False)
         image = pyglet.image.load('Static/Images/' + image_path)
         sprite_grid = pyglet.image.ImageGrid(image, 4, 8, item_width=sprite_width, item_height=sprite_height)
         row_image_sprite_number = image.width // sprite_width

@@ -63,7 +63,7 @@ if __name__ == '__main__':
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
 
-    temp_sprite = UISprite("image.png", Vector2(0, 0), Vector2(300, 200), 1, 0, 1, 120, 120)
+    temp_sprite = UISprite("image.png", Vector2.zero, Vector2(20, 20), 1, 0, 1, 120, 120)
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200))
     temp_container1.add_child(temp_sprite)
     #renderer.add_ui_object(temp_ui_text1)
