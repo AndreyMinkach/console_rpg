@@ -27,12 +27,6 @@ class MyWindow(pyglet.window.Window):
         glEnable(GL_TEXTURE_2D)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
-    def on_key_press(self, symbol, modifiers):
-        pass
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        print(f"{x, y}: {button}")
-
     def on_draw(self):
         self.clear()
         renderer.update()
@@ -52,8 +46,6 @@ if __name__ == '__main__':
                            Vector2(400, 200), Vector2(400, 100), font_size=20, color=ColorHelper.BLACK)
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
 
-    temp_v = Vector2(10, 20) + Vector2(5, 6)
-    print(temp_v)
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(100, 200))
     temp_container1.color = ColorHelper.GREEN[:3]
     temp_container1.children_margin = Vector2(10, 10)
@@ -62,11 +54,13 @@ if __name__ == '__main__':
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
 
-    temp_sprite = UISprite("image.png", Vector2.zero, Vector2(120, 120), 1, 0, 1, Vector2(120, 120))
+    temp_sprite = UISprite("image.png", Vector2.zero, Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
+
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200))
     temp_container1.add_child(temp_sprite)
-    #renderer.add_ui_object(temp_ui_text1)
-    renderer.add_ui_object(temp_sprite)
+    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
+
+    renderer.add_ui_object(temp_ui_text1)
     renderer.add_ui_object(temp_base1)
     renderer.add_ui_object(temp_container1)
 

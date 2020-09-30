@@ -1,6 +1,5 @@
 from pyglet import gl
 
-from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 from UI.ui_base import UIBase

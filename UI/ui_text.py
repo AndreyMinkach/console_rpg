@@ -2,7 +2,6 @@ from pyglet import font
 from pyglet.font.ttf import TruetypeInfo
 from typing import Tuple
 from pyglet.text import Label
-from Helpers.color_helper import ColorHelper
 from UI.ui_base import *
 
 
@@ -22,4 +21,5 @@ class UIText(UIBase):
                           y=position.y, width=size.x, height=size.y, multiline=True)
 
     def update_and_draw(self, **kwargs):
+        super().update_and_draw()
         self.text.draw()
