@@ -20,6 +20,7 @@ class UIBase(Sprite):
         self._position = position
         self._size = size
         self.parent = None
+        self._opacity = 255
         self._is_mouse_inside = False
 
         # event handlers

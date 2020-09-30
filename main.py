@@ -9,6 +9,7 @@ from Helpers.location_helper import Vector2
 from UI.renderer import Renderer
 from UI.ui_base import UIBase
 from UI.ui_scrollable_container import ScrollableContainer
+from UI.ui_sprite import UISprite
 from UI.ui_text import UIText
 
 renderer = Renderer()
@@ -27,17 +28,17 @@ class MyWindow(pyglet.window.Window):
         glEnable(GL_TEXTURE_2D)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
+    def on_key_press(self, symbol, modifiers):
+        pass
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        print(f"{x, y}: {button}")
+
     def on_draw(self):
         self.clear()
         renderer.update()
 
     def update(self, dt):
-        self.counter += dt
-
-        if self.counter >= 2 and not self.some_bool:
-            renderer._ui_objects_list[2].add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.GRAY))
-            self.some_bool = True
-
         # input helper should be updated after all other logic
         InputHelper.instance.update()
 
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     input_helper = InputHelper(window)
 
     temp_ui_text1 = UIText("Updates the callingpdates the calling abject ",
-                           Vector2(400, 200), Vector2(200, 0))
+                           Vector2(400, 200), Vector2(400, 100), font_size=20, color=ColorHelper.BLACK)
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
 
     temp_v = Vector2(10, 20) + Vector2(5, 6)
@@ -62,7 +63,11 @@ if __name__ == '__main__':
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
 
-    renderer.add_ui_object(temp_ui_text1)
+    temp_sprite = UISprite("image.png", Vector2(0, 0), Vector2(300, 200), 1, 0, 1, 120, 120)
+    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200))
+    temp_container1.add_child(temp_sprite)
+    #renderer.add_ui_object(temp_ui_text1)
+    renderer.add_ui_object(temp_sprite)
     renderer.add_ui_object(temp_base1)
     renderer.add_ui_object(temp_container1)
 
