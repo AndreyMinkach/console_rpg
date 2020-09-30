@@ -18,6 +18,6 @@ class UIText(UIBase):
         self.children = []
         self.children.append(text)
 
-    def update_and_draw(self):
+    def update_and_draw(self, **kwargs):
         for child in self.children:
             child.draw()
