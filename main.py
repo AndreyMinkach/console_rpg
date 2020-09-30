@@ -38,12 +38,8 @@ if __name__ == '__main__':
     window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
                       vsync=True)
 
-    temp_ui_text1 = UIText("Updates the callingpdates the calling abject and all its  Updates the calling abject "
-                           "and all itspdates the calling abject and all its  Updates the calling abject and all "
-                           "itspdates the calling abject and all its  Updates the calling abject and all its abject "
-                           "and all its  Updates the calling abject and all its ",
+    temp_ui_text1 = UIText("Updates the callingpdates the calling abject ",
                            Vector2(400, 200), Vector2(200, 0))
-
 
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200))
     renderer.add_ui_object(temp_ui_text1)
