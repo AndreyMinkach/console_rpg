@@ -1,23 +1,16 @@
-import time
-
 from pyglet import font
 from pyglet.font.ttf import TruetypeInfo
 from typing import Tuple
-
 from pyglet.text import Label
-
 from Helpers.color_helper import ColorHelper
 from UI.ui_base import *
-from itertools import chain
 
 
 def load_font(path):
-    # load external font from file
     p = TruetypeInfo(path)
-    name = p.get_name("name")
     p.close()
     font.add_file(path)
-    # print("Loaded font " + name + " from " + path)
+    # print("Loaded font " + p.get_name("name") + " from " + path)
 
 
 class UIText(UIBase):
