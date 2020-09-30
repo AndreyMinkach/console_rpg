@@ -1,3 +1,5 @@
+import time
+
 from Helpers.location_helper import Vector2
 
 
@@ -12,6 +14,8 @@ class InputHelper:
         self._mouse_scroll = 0
         self._mouse_pos = Vector2.zero
         self._mouse_pos_delta = Vector2.zero
+        self._mouse_event_frame_number = 0
+
         window.push_handlers(self.on_key_press, self.on_key_release, self.on_mouse_press, self.on_mouse_release,
                              self.on_mouse_scroll, self.on_mouse_motion)
 
@@ -28,6 +32,7 @@ class InputHelper:
         self._remove_mouse_button(button)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self._mouse_event_frame_number = self.window.total_frame_count
         self._set_mouse_scroll(scroll_y)
 
     def on_mouse_motion(self, x, y, dx, dy):
@@ -70,5 +75,7 @@ class InputHelper:
         return self._mouse_pos_delta
 
     def update(self):
-        self._mouse_scroll = 0
+        if self._mouse_event_frame_number != self.window.total_frame_count:
+            self._mouse_scroll = 0.0
+
         self._mouse_pos_delta = Vector2.zero

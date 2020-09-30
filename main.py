@@ -19,8 +19,7 @@ class MyWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_minimum_size(400, 300)
-        self.counter = 0
-        self.some_bool = False
+        self.total_frame_count = 0
 
     def on_activate(self):
         glClearColor(*[i / 255.0 for i in ColorHelper.DARK])
@@ -34,6 +33,9 @@ class MyWindow(pyglet.window.Window):
     def update(self, dt):
         # input helper should be updated after all other logic
         InputHelper.instance.update()
+        self.total_frame_count += 1
+        if self.total_frame_count > 1000:
+            self.total_frame_count -= 1000
 
 
 if __name__ == '__main__':
