@@ -1,4 +1,4 @@
-from pygame import Surface
+from pyglet import gl
 
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
@@ -7,51 +7,65 @@ from UI.ui_base import UIBase
 
 
 class ScrollableContainer(UIBase):
-    def __init__(self, position: Vector2, size: Vector2):
+    def __init__(self, position: Vector2, size: Vector2, offset_value=30):
         super().__init__(position, size)
         self.children_margin = Vector2.zero
         self._viewer_extent = Vector2.zero  # the total area occupied by all child elements
         self._vertical_offset = 0
-        self._offset_value = 30
+        self._offset_value = offset_value
         self._children = []
-        # super().set_colorkey(ColorHelper.BLACK)  # makes the container transparent
+        self._was_scissor_enabled = False
+
+    def _enable_scissor_test(self):
+        gl.glPushAttrib(gl.GL_ENABLE_BIT | gl.GL_TRANSFORM_BIT | gl.GL_CURRENT_BIT)
+        self._was_scissor_enabled = gl.glIsEnabled(gl.GL_SCISSOR_TEST)
+        gl.glEnable(gl.GL_SCISSOR_TEST)
+        gl.glScissor(int(self.x), int(self.y), int(self.width), int(self.height))
+
+    def _disable_scissor_test(self):
+        if not self._was_scissor_enabled:
+            gl.glDisable(gl.GL_SCISSOR_TEST)
+        gl.glPopAttrib()
 
     def add_child(self, child: UIBase):
         child.parent = self
         self._children.append(child)
-        self.calculate_viewer_extent()
+        self._calculate_viewer_extent()
 
     def remove_child(self, child: UIBase):
         child.parent = None
         self._children.remove(child)
-        self.calculate_viewer_extent()
+        self._calculate_viewer_extent()
 
-    def calculate_viewer_extent(self):
+    def _calculate_viewer_extent(self):
         extent_x, extent_y = (0, 0)
         child_number = len(self._children)
         for child in self._children:
             extent_x = max(child.size.x, extent_x)
             extent_y += child.size.y
         self._viewer_extent = Vector2(extent_x, extent_y + self.children_margin.y * child_number)
+        self._vertical_offset = self.size.y - self._viewer_extent.y - self.children_margin.y
 
-    def update_and_draw(self, display_canvas: Surface):
-        super().update_and_draw(display_canvas)
-        self.fill(ColorHelper.BLACK)
+    def update_and_draw(self, **kwargs):
+        self._enable_scissor_test()
+        super().update_and_draw()
         self._update_scroll()
 
         viewer_height = 0  # stores a total height of viewer as if the children were placed one behind the other
-        for i in range(len(self._children)):
+        for i in range(len(self._children) - 1, -1, -1):
             child = self._children[i]
             if isinstance(child, UIBase):
                 viewer_height += self.children_margin.y
-                child.position = Vector2(self.children_margin.x, viewer_height + self._vertical_offset)
-                child.update_and_draw(self)
+                child.position = self.position + Vector2(self.children_margin.x, viewer_height + self._vertical_offset)
+                child.update_and_draw()
                 viewer_height += child.size.y
 
+        self._disable_scissor_test()
+
     def _update_scroll(self):
-        mouse_pos = InputHelper.instance.mouse_position
+        mouse_pos = InputHelper.instance.get_mouse_pos()
         is_cursor_inside = self.is_point_inside(mouse_pos)
         if is_cursor_inside:
-            self._vertical_offset += InputHelper.instance.mouse_wheel_delta * self._offset_value
+            self._vertical_offset += -InputHelper.instance.get_mouse_scroll() * self._offset_value
             self._vertical_offset = max(min(0, self.size.y - self._viewer_extent.y - self.children_margin.y),
                                         min(self._vertical_offset, 0))

@@ -30,5 +30,5 @@ class ItemLoader(JsonLoader):
 
         located_item_class = locate(item_type)
         item_instance = located_item_class()  # call constructor of class to get its instance
-        item_instance.__dict__.update_and_draw(temp_dict)
+        item_instance.__dict__.update(temp_dict)
         return item_instance

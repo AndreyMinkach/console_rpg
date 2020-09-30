@@ -15,7 +15,12 @@ class Vector2:
         return Vector2(self.x - other.x, self.y - other.y)
 
     def __mul__(self, other):
-        return Vector2(self.x - other.x, self.y - other.y)
+        if isinstance(other, Vector2):
+            return Vector2(self.x - other.x, self.y - other.y)
+        elif isinstance(other, int):
+            return Vector2(self.x * other, self.y * other)
+        else:
+            return self
 
     def __repr__(self):
         return f"({self.x}, {self.y})"
