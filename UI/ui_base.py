@@ -23,6 +23,7 @@ class UIBase(Sprite):
         self.children.append(self)
         self._position = position
         self._size = size
+        self.custom_data = None  # can contain some data to simplify data transfer between scripts
         self.parent = None
         self._opacity = 255
         self._is_mouse_inside = False
@@ -82,7 +83,7 @@ class UIBase(Sprite):
         :param mouse_pos: position of the cursor relative to the window
         """
         if click_lambda is not None and isinstance(click_lambda, types.LambdaType):
-            button = InputHelper.instance.get_last_mouse_button_down() if click_type == 1\
+            button = InputHelper.instance.get_last_mouse_button_down() if click_type == 1 \
                 else InputHelper.instance.get_last_mouse_button_up() if click_type == 0 else -1
             if button != -1 and self.is_point_inside(mouse_pos):
                 click_lambda(self, button)
