@@ -20,23 +20,13 @@ class UIInventory(UIBase):
                                     color=ColorHelper.YELLOW)
         temp_ui_text1 = UIText("help1",
                                Vector2(200, 230), Vector2(300, 30), font_size=20, color=ColorHelper.BLACK)
-        temp_ui_text2 = UIText("help2",
-                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
-        temp_ui_text3 = UIText("help3",
-                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
-        temp_ui_text4 = UIText("help4",
-                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
-        temp_ui_text5 = UIText("help5",
-                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
-        temp_ui_text6 = UIText("help6",
-                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
 
         inventory_container = ScrollableContainer(Vector2(position.x + 10, position.y + 10), Vector2(380, 170))
         temp_container1 = ScrollableContainer(Vector2(position.x + 10, position.y + 10), Vector2(380, 170))
         temp_container1.color = ColorHelper.GREEN[:3]
         temp_container1.children_margin = Vector2(10, 10)
 
-        #temp_container1.add_child(temp_ui_text1)
+        # temp_container1.add_child(temp_ui_text1)
         temp_container1.add_child(someone_invent_btn)
 
         self.children.append(my_invent_btn)
@@ -45,7 +35,6 @@ class UIInventory(UIBase):
         self.children.append(temp_container1)
 
         # main_window.children.append(my_invent_btn)
-        #
 
     def update_and_draw(self, **kwargs):
         super().update_and_draw()
