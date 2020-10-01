@@ -38,6 +38,6 @@ class UIInventory(UIBase):
         super().update_logic()
         for ui_element in self.children:
             if isinstance(ui_element, ScrollableContainer):
-                ui_element.update_and_draw()
+                ui_element.update_logic()
             else:
                 ui_element.draw()
