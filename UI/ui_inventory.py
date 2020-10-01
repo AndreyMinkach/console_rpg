@@ -6,6 +6,7 @@ from Gameplay.inventory import Inventory
 from Helpers.color_helper import ColorHelper
 from Items.items_loader import ItemLoader
 from UI.ui_base import UIBase
+from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_text import UIText
 
 
@@ -13,28 +14,43 @@ class UIInventory(UIBase):
     def __init__(self, position: Vector2, size: Vector2):
         super().__init__(position, size)
 
-        my_invent_btn = UIBase(Vector2(10, 10), Vector2(185, 50))
-        my_invent_btn.fill(ColorHelper.YELLOW)
+        my_invent_btn = UIBase(Vector2(position.x + 10, position.y + size.y - 60), Vector2(185, 50),
+                               color=ColorHelper.GREEN)
+        someone_invent_btn = UIBase(Vector2(position.x + 205, position.y + size.y - 60), Vector2(185, 50),
+                                    color=ColorHelper.YELLOW)
+        temp_ui_text1 = UIText("help1",
+                               Vector2(200, 230), Vector2(300, 30), font_size=20, color=ColorHelper.BLACK)
+        temp_ui_text2 = UIText("help2",
+                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
+        temp_ui_text3 = UIText("help3",
+                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
+        temp_ui_text4 = UIText("help4",
+                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
+        temp_ui_text5 = UIText("help5",
+                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
+        temp_ui_text6 = UIText("help6",
+                               Vector2(200, 230), Vector2(300, 59), font_size=20, color=ColorHelper.BLACK)
 
-        someone_invent_btn = UIBase(Vector2(205, 10), Vector2(185, 50))
-        someone_invent_btn.fill(ColorHelper.YELLOW)
+        inventory_container = ScrollableContainer(Vector2(position.x + 10, position.y + 10), Vector2(380, 170))
+        temp_container1 = ScrollableContainer(Vector2(position.x + 10, position.y + 10), Vector2(380, 170))
+        temp_container1.color = ColorHelper.GREEN[:3]
+        temp_container1.children_margin = Vector2(10, 10)
 
-        q = UIBase(Vector2(100, 100), Vector2(100, 100))
-        q.fill(ColorHelper.YELLOW)
+        #temp_container1.add_child(temp_ui_text1)
+        temp_container1.add_child(someone_invent_btn)
 
-        temp_text = UIText(Vector2(600, 100), Vector2(100, 10), "Hello")
-        font_obj = pygame.font.Font(None, 30)
-
-        print(font_obj)
-
-        self.children.append(font_obj.update_and_draw())
-        self.children.append(temp_text)
+        self.children.append(my_invent_btn)
+        self.children.append(temp_ui_text1)
+        self.children.append(someone_invent_btn)
+        self.children.append(temp_container1)
 
         # main_window.children.append(my_invent_btn)
         #
 
     def update_and_draw(self, **kwargs):
+        super().update_and_draw()
         for ui_element in self.children:
-            print(ui_element)
-            self.blit(ui_element, (10, 10))
-        display_canvas.blit(self, (self.position.x, self.position.y))
+            if isinstance(ui_element, ScrollableContainer):
+                ui_element.update_and_draw()
+            else:
+                ui_element.draw()
