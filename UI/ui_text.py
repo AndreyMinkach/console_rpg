@@ -18,7 +18,7 @@ load_font('Static/Fonts/DisposableDroidBB.ttf')
 
 class UIText(UIBase):
     def __init__(self, text: str, position: Vector2, size: Vector2, font_size: int,
-                 color: Tuple[int, int, int, int] = ColorHelper.GREEN):
+                 color: Tuple[int, int, int, int] = ColorHelper.GREEN, background: bool = False):
         size.y = max(1, size.y)
         super().__init__(position, size, transparent=True)
         self.my_label = Label(text, font_name='DisposableDroid BB', font_size=font_size, color=color, x=position.x,

@@ -61,9 +61,9 @@ if __name__ == '__main__':
     def test(o, color):
         o.color = color
 
-    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
-    temp_base1.on_click_down = lambda o, b: test(o, ColorHelper.GREEN[:3])
-    temp_base1.on_click_up = lambda o, b: test(o, ColorHelper.LIGHT_BLUE[:3])
+    # temp_base1 = UIBase(Vector2(0, 0), Vector2(100, 100), color=ColorHelper.GRAY)
+    # temp_base1.on_click_down = lambda o, b: test(o, ColorHelper.GREEN[:3])
+    # temp_base1.on_click_up = lambda o, b: test(o, ColorHelper.LIGHT_BLUE[:3])
 
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
     temp_container1.on_click_down = lambda o, b: (test(o, ColorHelper.LIGHT_BLUE[:3]), temp_container1.clear_children())
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     temp_container1.add_child(temp_ui_text1)
 
-    ui_invent = UIInventory(Vector2(0, 100), Vector2(400, 300))
+    ui_invent = UIInventory(Vector2(10, 100), Vector2(400, 300))
 
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
     temp_container1.add_child(temp_sprite)
