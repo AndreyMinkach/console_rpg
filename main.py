@@ -7,6 +7,7 @@ from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 from UI.renderer import Renderer
 from UI.ui_base import UIBase
+from UI.ui_inventory import UIInventory
 from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_sprite import UISprite
 from UI.ui_text import UIText
@@ -28,13 +29,11 @@ class MyWindow(pyglet.window.Window):
 
     def on_draw(self):
         self.clear()
-        # print(self.total_frame_count, 'render')
         renderer.draw()
 
     def update(self, dt):
         renderer.update_logic()
 
-        # print(self.total_frame_count, 'update')
         # input helper should be updated after all other logic
         InputHelper.instance.update()
         self.total_ticks += 1
@@ -48,8 +47,12 @@ if __name__ == '__main__':
 
     input_helper = InputHelper(window)
 
-    temp_ui_text1 = UIText("Updates the callingpdates the calling abject ",
-                           Vector2(400, 200), Vector2(400, 100), font_size=20, color=ColorHelper.BLACK)
+    temp_ui_text1 = UIText("Death weeks early had their and folly timed put. Hearted forbade on an village ye i"
+                           "n fifteen. Age attended betrayed her man raptures la",
+                           Vector2.zero, Vector2(300, 270), font_size=20, color=ColorHelper.BLACK)
+
+    temp_ui_text2 = UIText("Instrument terminated of as astonished literature motionless admiration. ",
+                           Vector2.zero, Vector2(400, 100), font_size=20, color=ColorHelper.BLACK)
 
     def test(o, color):
         o.color = color
@@ -58,7 +61,7 @@ if __name__ == '__main__':
     temp_base1.on_click_down = lambda o, b: test(o, ColorHelper.GREEN[:3])
     temp_base1.on_click_up = lambda o, b: test(o, ColorHelper.LIGHT_BLUE[:3])
 
-    temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(100, 200))
+    temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
     temp_container1.color = ColorHelper.GREEN[:3]
     temp_container1.children_margin = Vector2(10, 10)
     temp_container1.add_child(UIBase(Vector2(10, 10), Vector2(50, 60), color=ColorHelper.BLACK))
@@ -66,10 +69,12 @@ if __name__ == '__main__':
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
 
-    temp_sprite = UISprite("image.png", Vector2.zero, Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
+    temp_container1.add_child(temp_ui_text1)
 
+    ui_invent = UIInventory(Vector2(0, 100), Vector2(400, 300))
+
+    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
     temp_container1.add_child(temp_sprite)
-    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

@@ -19,7 +19,14 @@ class UIText(UIBase):
                  color: Tuple[int, int, int, int] = ColorHelper.GREEN):
         super().__init__(position, size, transparent=True)
         self.text = Label(text, font_name='DisposableDroid BB', font_size=font_size, color=color, x=position.x,
-                          y=position.y, width=size.x, height=size.y, multiline=True)
+                          y=position.y, width=size.x, height=size.y, multiline=True, anchor_y='center')
+        super().__init__(position, Vector2(self.text.content_width, self.text.content_height), transparent=True)
+
+    @UIBase.position.setter
+    def position(self, value: Vector2):
+        UIBase.position.fset(self, value)
+        self.text.x = value.x
+        self.text.y = value.y
 
     def update_logic(self, **kwargs):
         super().update_logic()
