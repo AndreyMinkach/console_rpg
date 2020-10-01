@@ -41,11 +41,20 @@ class ScrollableContainer(UIBase):
         self._calculate_viewer_extent()
 
     def remove_child(self, child: UIBase):
+        self._remove_child(child)
+
+    def _remove_child(self, child: UIBase, only_detach: bool = False):
         child.parent = None
         child.batch = Renderer.instance.get_batch()
         child.group = Renderer.instance.get_main_group()
-        self._children.remove(child)
+        if not only_detach:
+            self._children.remove(child)
         self._calculate_viewer_extent()
+
+    def clear_children(self):
+        for child in self._children:
+            self._remove_child(child, True)
+        self._children.clear()
 
     def _calculate_viewer_extent(self):
         extent_x, extent_y = (0, 0)
