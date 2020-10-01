@@ -20,29 +20,25 @@ class MyWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_minimum_size(400, 300)
-        self.total_frame_count = 0
+        self.total_ticks = 0
 
     def on_activate(self):
         glClearColor(*[i / 255.0 for i in ColorHelper.DARK])
         glEnable(GL_TEXTURE_2D)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
-    def on_key_press(self, symbol, modifiers):
-        pass
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        print(f"{x, y}: {button}")
-
     def on_draw(self):
         self.clear()
-        renderer.update()
+        renderer.draw()
 
     def update(self, dt):
+        renderer.update_logic()
+
         # input helper should be updated after all other logic
         InputHelper.instance.update()
-        self.total_frame_count += 1
-        if self.total_frame_count > 1000:
-            self.total_frame_count -= 1000
+        self.total_ticks += 1
+        if self.total_ticks > 1000:
+            self.total_ticks -= 1000
 
 
 if __name__ == '__main__':
@@ -58,23 +54,27 @@ if __name__ == '__main__':
     temp_ui_text2 = UIText("Instrument terminated of as astonished literature motionless admiration. ",
                            Vector2.zero, Vector2(400, 100), font_size=20, color=ColorHelper.BLACK)
 
-    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
+    def test(o, color):
+        o.color = color
 
-    temp_v = Vector2(10, 20) + Vector2(5, 6)
+    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
+    temp_base1.on_click_down = lambda o, b: test(o, ColorHelper.GREEN[:3])
+    temp_base1.on_click_up = lambda o, b: test(o, ColorHelper.LIGHT_BLUE[:3])
+
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
     temp_container1.color = ColorHelper.GREEN[:3]
-    temp_container1.children_margin = Vector2(5, 5)
+    temp_container1.children_margin = Vector2(10, 10)
+    temp_container1.add_child(UIBase(Vector2(10, 10), Vector2(50, 60), color=ColorHelper.BLACK))
+    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
+    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
+    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
 
     temp_container1.add_child(temp_ui_text1)
 
-
     ui_invent = UIInventory(Vector2(0, 100), Vector2(400, 300))
-    renderer.add_ui_object(ui_invent)
 
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
-    # temp_container1.add_child(temp_sprite)
-    renderer.add_ui_object(temp_ui_text2)
-    renderer.add_ui_object(temp_container1)
+    temp_container1.add_child(temp_sprite)
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

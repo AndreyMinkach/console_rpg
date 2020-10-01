@@ -1,5 +1,3 @@
-import pygame
-from pygame import Vector2
 from UI.ui_base import *
 
 from Gameplay.inventory import Inventory
@@ -36,8 +34,8 @@ class UIInventory(UIBase):
 
         # main_window.children.append(my_invent_btn)
 
-    def update_and_draw(self, **kwargs):
-        super().update_and_draw()
+    def update_logic(self, **kwargs):
+        super().update_logic()
         for ui_element in self.children:
             if isinstance(ui_element, ScrollableContainer):
                 ui_element.update_and_draw()
