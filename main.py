@@ -19,7 +19,7 @@ class MyWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_minimum_size(400, 300)
-        self.total_frame_count = 0
+        self.total_ticks = 0
 
     def on_activate(self):
         glClearColor(*[i / 255.0 for i in ColorHelper.DARK])
@@ -28,14 +28,18 @@ class MyWindow(pyglet.window.Window):
 
     def on_draw(self):
         self.clear()
-        renderer.update()
+        # print(self.total_frame_count, 'render')
+        renderer.draw()
 
     def update(self, dt):
+        renderer.update_logic()
+
+        # print(self.total_frame_count, 'update')
         # input helper should be updated after all other logic
         InputHelper.instance.update()
-        self.total_frame_count += 1
-        if self.total_frame_count > 1000:
-            self.total_frame_count -= 1000
+        self.total_ticks += 1
+        if self.total_ticks > 1000:
+            self.total_ticks -= 1000
 
 
 if __name__ == '__main__':
@@ -46,25 +50,26 @@ if __name__ == '__main__':
 
     temp_ui_text1 = UIText("Updates the callingpdates the calling abject ",
                            Vector2(400, 200), Vector2(400, 100), font_size=20, color=ColorHelper.BLACK)
+
+    def test(o, color):
+        o.color = color
+
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
+    temp_base1.on_click_down = lambda o, b: test(o, ColorHelper.GREEN[:3])
+    temp_base1.on_click_up = lambda o, b: test(o, ColorHelper.LIGHT_BLUE[:3])
 
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(100, 200))
     temp_container1.color = ColorHelper.GREEN[:3]
     temp_container1.children_margin = Vector2(10, 10)
-    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.BLACK))
+    temp_container1.add_child(UIBase(Vector2(10, 10), Vector2(50, 60), color=ColorHelper.BLACK))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
 
     temp_sprite = UISprite("image.png", Vector2.zero, Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
 
-    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200))
     temp_container1.add_child(temp_sprite)
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
-
-    renderer.add_ui_object(temp_ui_text1)
-    renderer.add_ui_object(temp_base1)
-    renderer.add_ui_object(temp_container1)
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

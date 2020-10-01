@@ -21,6 +21,6 @@ class UISprite(UIBase):
         self.sprite.x = value.x
         self.sprite.y = value.y
 
-    def update_and_draw(self):
-        super().update_and_draw()
+    def update_logic(self):
+        super().update_logic()
         self.sprite.draw()

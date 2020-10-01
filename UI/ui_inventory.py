@@ -27,13 +27,13 @@ class UIInventory(UIBase):
 
         print(font_obj)
 
-        self.children.append(font_obj.update_and_draw())
+        self.children.append(font_obj.update_logic())
         self.children.append(temp_text)
 
         # main_window.children.append(my_invent_btn)
         #
 
-    def update_and_draw(self, **kwargs):
+    def update_logic(self, **kwargs):
         for ui_element in self.children:
             print(ui_element)
             self.blit(ui_element, (10, 10))

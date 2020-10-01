@@ -34,7 +34,7 @@ class Quest:
         self._current_stage = self.stages[self._current_stage_index]
 
     def update(self):
-        if self._current_stage.update_and_draw() is True:
+        if self._current_stage.update() is True:
             self.select_next_stage()
 
 
@@ -85,7 +85,7 @@ class QuestManager(JsonLoader):
     def update(self):
         completed_quest_list = []
         for quest in self._active_quest_list:
-            quest.update_and_draw()
+            quest.update()
             if quest.status == QuestStatus.Completed:
                 completed_quest_list.append(quest)
 
