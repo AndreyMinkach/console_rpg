@@ -22,7 +22,7 @@ class UIText(UIBase):
     def __init__(self, caption: str, position: Vector2 = Vector2.zero, size: Vector2 = Vector2.one,
                  document_style=None, font_name: str = 'DisposableDroid BB', font_size: int = 20,
                  color: (int, int, int, int) = ColorHelper.WHITE,
-                 hover_color: (int, int, int, int) = ColorHelper.WHITE):
+                 hover_color: (int, int, int, int) = ColorHelper.TRANSPARENT):
         super().__init__(position, size)
         document_style = {} if document_style is None else document_style
         document_style.update(dict(font_name=font_name, font_size=font_size))
@@ -31,14 +31,12 @@ class UIText(UIBase):
         self._document = FormattedDocument(caption)
         self.update_document_style(document_style)
         self._text_layout = TextLayout(self._document, width=size.x, height=size.y, batch=self.batch,
-                                       group=OrderedGroup(self.group.order + 1), wrap_lines=True, multiline=True)
+                                       group=OrderedGroup(self.group.order + 1.1), wrap_lines=True, multiline=True)
         self._text_layout.content_valign = 'center'
         self.position = position
-        self._background_color = color
         self.color = color
-
-        self.on_mouse_enter = lambda o: self._set_background_color(hover_color)
-        self.on_mouse_leave = lambda o: self._set_background_color(self._background_color)
+        self._set_background_color(hover_color)
+        self._set_background_color(self._background_color)
 
     def set_text(self, text: str):
         self.my_label.text = text

@@ -18,7 +18,7 @@ class UIInventory(UIBase):
 
         all_items = ItemLoader()
         hero_invent = Inventory()
-        self._child_group = OrderedGroup(self.group.order + 1)
+        self._child_group = OrderedGroup(self.group.order + 0.2)
 
         weapon1 = all_items.get_item_by_id(1)
         outfit1 = all_items.get_item_by_id(50)
@@ -47,15 +47,17 @@ class UIInventory(UIBase):
 
             self.item_list_container.scale_y = sc_cnt_high_other_invent / sc_cnt_high_no_other_invent
             self.item_list_container.size.y = sc_cnt_high_no_other_invent * self.item_list_container.scale_y
-
+            button_click_color = (125, 125, 125, 180)
             self.my_inv_button = UIButton("My inventory", Vector2(position.x + indent, position.y + indent),
                                           Vector2(self.button_size.x, self.button_size.y), font_size=20,
-                                          color=ColorHelper.GRAY, document_style=dict(align='center'))
-            self.other_inv_button = UIButton("Someone inventory",
+                                          color=ColorHelper.GRAY, hover_color=button_click_color,
+                                          document_style=dict(align='center'))
+            self.other_inv_button = UIButton("Someone\ninventory",
                                              Vector2(position.x + size.x - indent - self.button_size.x,
-                                                     position.y + indent),
-                                             Vector2(self.button_size.x, self.button_size.y), font_size=20,
-                                             color=ColorHelper.GRAY, document_style=dict(align='center'))
+                                                     position.y + indent), self.button_size, font_size=20,
+                                             color=ColorHelper.GRAY, hover_color=button_click_color,
+                                             document_style=dict(align='center'))
+
             self.other_inv_button.group = self._child_group
             self.other_inv_button.custom_data = other_inventory
             self.my_inv_button.group = self._child_group
@@ -66,9 +68,8 @@ class UIInventory(UIBase):
 
         self.chosen_invent = hero_invent
 
-
         sprite_pos = [Vector2(13, 1), Vector2(11, 7), Vector2(4, 1), Vector2(3, 9), Vector2(5, 5)]
-        choose_item_type_name = ['Weapon', "Outfit", "Heal", "Food", "Ore"]
+        item_type_name = ['Weapon', "Outfit", "Heal", "Food", "Ore"]
         sprite_size = Vector2(32, 32)
         step = 80
         for i in range(len(sprite_pos)):
@@ -79,7 +80,7 @@ class UIInventory(UIBase):
             weapon_type_sprite.group = self._child_group
 
             weapon_type_sprite.on_click_down = lambda o, b: \
-                self.show_items_by_type(choose_item_type_name[o.custom_data], self.chosen_invent,
+                self.show_items_by_type(item_type_name[o.custom_data], self.chosen_invent,
                                         self.item_list_container)
 
     def choose_inventory(self, o, item_list_container):
@@ -88,10 +89,11 @@ class UIInventory(UIBase):
 
     def show_items_by_type(self, items_type: str, invent, item_list_container):
         item_list_container.delete_children()
+        indent = 10
+        one_line_high = 22
         for item in invent.get_item_list_by_type(items_type):
-            item_text = UIText(item.name, Vector2.zero,
-                               Vector2(item_list_container.size.x, 2), 20,
-                               ColorHelper.BLACK)
+            item_text = UIText(item.name, Vector2.zero, Vector2(item_list_container.size.x - indent, one_line_high),
+                               font_size=20, color=ColorHelper.GRAY, document_style=dict(color=ColorHelper.BLACK))
             item_list_container.add_child(item_text)
         item_list_container.group = self._child_group
 
