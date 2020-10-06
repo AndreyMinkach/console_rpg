@@ -63,9 +63,13 @@ if __name__ == '__main__':
                            Vector2.zero, Vector2(400, 0), font_size=20, color=ColorHelper.WHITE)
     temp_ui_text2.on_click_down = lambda o, b: change_text(o)
 
+    temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
+                               Vector2(420, 350), Vector2(200, 60), color=(40, 50, 70, 255),
+                               hover_color=(200, 50, 70, 150),
+                               document_style=dict(color=(255, 255, 255, 255), align='center'))
+    temp_ui_button1.size = Vector2(300, 80)
 
-    def test(o, color):
-        o.color = color
+    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
 
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
     temp_container1.on_click_down = lambda o, b: (test(o, ColorHelper.LIGHT_BLUE[:3]), temp_container1.clear_children())

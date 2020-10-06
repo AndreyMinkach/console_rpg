@@ -52,8 +52,9 @@ class UIBase(Sprite):
 
     @size.setter
     def size(self, value: Vector2):
+        self.scale_x = value.x / float(self._size.x)
+        self.scale_y = value.y / float(self._size.y)
         self._size = value
-        # TODO: Implement object scaling
 
     def delete_children(self):
         for child in self._children:
@@ -87,7 +88,7 @@ class UIBase(Sprite):
     def _update_click_event(self, click_lambda, click_type: int, mouse_pos: Vector2):
         """
         :param click_lambda: lambda which is called when user clicks on ui object
-        :param click_type: 1 - user pressed down mouse button, 0 - user releases mouse button
+        :param click_type: 1 - user presses down mouse button, 0 - user releases mouse button
         :param mouse_pos: position of the cursor relative to the window
         """
         if click_lambda is not None and isinstance(click_lambda, types.LambdaType):
