@@ -46,7 +46,7 @@ class UIButton(UIBase):
     @UIBase.group.setter
     def group(self, value: OrderedGroup):
         UIBase.group.fset(self, value)
-        self._text_layout.group = value
+        self._text_layout.group = OrderedGroup(self.group.order + 1)
 
     @UIBase.position.setter
     def position(self, value: Vector2):

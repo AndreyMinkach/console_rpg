@@ -10,6 +10,7 @@ from Helpers.location_helper import Vector2
 from Items.items_loader import ItemLoader
 from UI.renderer import Renderer
 from UI.ui_base import UIBase
+from UI.ui_button import UIButton
 from UI.ui_inventory import UIInventory
 from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_sprite import UISprite
@@ -50,18 +51,7 @@ if __name__ == '__main__':
 
     input_helper = InputHelper(window)
 
-    temp_ui_text1 = UIText("Death weeks early had their and folly timed put. Hearted forbade on an village ye i"
-                           "n fifteen. Age attended betrayed her man raptures la",
-                           Vector2.zero, Vector2(300, 270), font_size=20, color=ColorHelper.BLACK)
-
-
-    def change_text(o):
-        o.set_text('Some other text')
-
-
-    temp_ui_text2 = UIText("Instrument terminated of as astonished literature motionless admiration. ",
-                           Vector2.zero, Vector2(400, 0), font_size=20, color=ColorHelper.WHITE)
-    temp_ui_text2.on_click_down = lambda o, b: change_text(o)
+    temp_ui_text1 = UIText("Death weeks early had ", Vector2.zero, Vector2(300, 270))
 
     temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
                                Vector2(420, 350), Vector2(200, 60), color=(40, 50, 70, 255),
@@ -69,10 +59,7 @@ if __name__ == '__main__':
                                document_style=dict(color=(255, 255, 255, 255), align='center'))
     temp_ui_button1.size = Vector2(300, 80)
 
-    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
-
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
-    temp_container1.on_click_down = lambda o, b: (test(o, ColorHelper.LIGHT_BLUE[:3]), temp_container1.clear_children())
     temp_container1.color = ColorHelper.GREEN[:3]
     temp_container1.children_margin = Vector2(10, 10)
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.BLACK))
