@@ -6,6 +6,7 @@ from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 from UI.renderer import Renderer
+from UI.shadered_rectangle import UIRectangle
 from UI.ui_base import UIBase
 from UI.ui_inventory import UIInventory
 from UI.ui_scrollable_container import ScrollableContainer
@@ -21,15 +22,22 @@ class MyWindow(pyglet.window.Window):
         super().__init__(*args, **kwargs)
         self.set_minimum_size(400, 300)
         self.total_ticks = 0
+        self.some_shaded_object: UIRectangle = None
 
     def on_activate(self):
         glClearColor(*[i / 255.0 for i in ColorHelper.DARK])
-        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_TEXTURE_2D and GL_BLEND and GL_ALPHA_TEST)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX)
+        glAlphaFunc(GL_GREATER, 0.5)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        self.some_shaded_object = UIRectangle('some_fractal.png', Vector2(400, 100), Vector2(400, 300))
 
     def on_draw(self):
         self.clear()
         renderer.draw()
+        self.some_shaded_object.draw()
 
     def update(self, dt):
         renderer.update_logic()
@@ -51,15 +59,19 @@ if __name__ == '__main__':
                            "n fifteen. Age attended betrayed her man raptures la",
                            Vector2.zero, Vector2(300, 270), font_size=20, color=ColorHelper.BLACK)
 
+
     def change_text(o):
         o.set_text('Some other text')
+
 
     temp_ui_text2 = UIText("Instrument terminated of as astonished literature motionless admiration. ",
                            Vector2.zero, Vector2(400, 0), font_size=20, color=ColorHelper.WHITE)
     temp_ui_text2.on_click_down = lambda o, b: change_text(o)
 
+
     def test(o, color):
         o.color = color
+
 
     temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
     temp_base1.on_click_down = lambda o, b: test(o, ColorHelper.GREEN[:3])
