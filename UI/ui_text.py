@@ -2,7 +2,7 @@ from pyglet import font
 from pyglet.font.ttf import TruetypeInfo
 from typing import Tuple
 
-from pyglet.graphics import Batch, Group
+from pyglet.graphics import Batch, Group, OrderedGroup
 from pyglet.text import Label
 from UI.ui_base import *
 
@@ -18,12 +18,13 @@ load_font('Static/Fonts/DisposableDroidBB.ttf')
 
 class UIText(UIBase):
     def __init__(self, text: str, position: Vector2, size: Vector2, font_size: int,
-                 color: Tuple[int, int, int, int] = ColorHelper.GREEN, background: bool = False):
+                 color: Tuple[int, int, int, int] = ColorHelper.GREEN, anchor_x: str = 'left'):
         size.y = max(1, size.y)
         super().__init__(position, size, transparent=True)
+
         self.my_label = Label(text, font_name='DisposableDroid BB', font_size=font_size, color=color, x=position.x,
-                              y=position.y, width=size.x, height=1, multiline=True, anchor_y='bottom',
-                              batch=self.batch, group=self.group)
+                              y=position.y, width=size.x, height=1, multiline=True, anchor_x=anchor_x,
+                              anchor_y='bottom', batch=self.batch, group=OrderedGroup(self.group.order + 2))
         self.my_label.content_valign = 'center'
         self.size.y = self.my_label.content_height
         self.my_label.height = self.my_label.content_height

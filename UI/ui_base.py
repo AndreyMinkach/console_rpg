@@ -1,6 +1,7 @@
 import types
 
 import pyglet
+from pyglet.graphics import Batch, Group
 from pyglet.sprite import Sprite
 
 from Animation.number_field_animation import NumberFieldAnimation
@@ -53,6 +54,13 @@ class UIBase(Sprite):
     def size(self, value: Vector2):
         self._size = value
         # TODO: Implement object scaling
+
+    def delete_children(self):
+        for child in self._children:
+            child.batch = None
+            child.group = None
+        self._children.clear()
+        del self._children[:]
 
     def update_logic(self, **kwargs):
         if self.enabled:
