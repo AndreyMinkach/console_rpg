@@ -19,7 +19,8 @@ class UIButton(UIBase):
         self._caption = caption
         self._document = FormattedDocument(caption)
         self.update_document_style(document_style)
-        self._text_layout = TextLayout(self._document, width=size.x, batch=self.batch, height=size.y, wrap_lines=True, multiline=True)
+        self._text_layout = TextLayout(self._document, width=size.x, batch=self.batch, height=size.y, wrap_lines=True,
+                                       multiline=True)
         self._update_text_layout_groups(self.group)
         self._text_layout.content_valign = 'center'
         self.position = position

@@ -64,11 +64,11 @@ class UIBase(Sprite):
         self._size = value
 
     def delete_children(self):
-        for child in self._children:
+        for child in self.children:
             child.batch = None
             child.group = None
-        self._children.clear()
-        del self._children[:]
+        self.children.clear()
+        del self.children[:]
 
     @Sprite.batch.setter
     def batch(self, value: Batch):

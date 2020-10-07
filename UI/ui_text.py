@@ -60,7 +60,7 @@ class UIText(UIBase):
     @UIBase.group.setter
     def group(self, value: OrderedGroup):
         UIBase.group.fset(self, value)
-        self._text_layout.group = value
+        self._update_text_layout_groups(value)
 
     @UIBase.position.setter
     def position(self, value: Vector2):
@@ -87,6 +87,11 @@ class UIText(UIBase):
     def update_document_style(self, style: dict):
         if style is not None:
             self._document.set_style(0, len(self._caption), style)
+
+    def _update_text_layout_groups(self, group: OrderedGroup):
+        self._text_layout.begin_update()
+        self._text_layout._init_groups(OrderedGroup(group.order + 1))
+        self._text_layout.end_update()
 
     def update_logic(self, **kwargs):
         super().update_logic()

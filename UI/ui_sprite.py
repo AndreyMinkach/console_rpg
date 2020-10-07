@@ -36,6 +36,10 @@ class UISprite(UIBase):
         self.sprite.x = value.x
         self.sprite.y = value.y
 
+    def set_enabled(self, enable: bool):
+        super().set_enabled(enable)
+        self.sprite.batch = self.batch
+
     def update_logic(self):
         super().update_logic()
         # self.sprite.draw()

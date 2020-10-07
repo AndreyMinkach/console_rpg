@@ -80,13 +80,12 @@ if __name__ == '__main__':
     enemy_invent.add_item(weapon2)
     enemy_invent.add_item(outfit3)
 
-    ui_invent = UIInventory(Vector2(10, 100), Vector2(400, 300), enemy_invent)
+    ui_invent = UIInventory(Vector2(10, 100), Vector2(400, 300), enabled=True)
+    ui_invent.show_inventory(enemy_invent)
 
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
     temp_container1.add_child(temp_sprite)
-
-    temp_base1 = UIBase(Vector2(0, 420), Vector2(120, 50), color=ColorHelper.GRAY)
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()
