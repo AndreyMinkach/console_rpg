@@ -2,7 +2,7 @@ import types
 from typing import List
 
 import pyglet
-from pyglet.graphics import Batch, OrderedGroup
+from pyglet.graphics import Batch, Group, OrderedGroup
 from pyglet.sprite import Sprite
 
 from Animation.number_field_animation import NumberFieldAnimation
@@ -45,6 +45,7 @@ class UIBase(Sprite):
 
     @position.setter
     def position(self, value: Vector2):
+        self._position = value
         self.x = value.x
         self.y = value.y
         pos_difference = value - self.position
@@ -61,6 +62,13 @@ class UIBase(Sprite):
         self.scale_x = value.x / float(self._size.x)
         self.scale_y = value.y / float(self._size.y)
         self._size = value
+
+    def delete_children(self):
+        for child in self.children:
+            child.batch = None
+            child.group = None
+        self.children.clear()
+        del self.children[:]
 
     @Sprite.batch.setter
     def batch(self, value: Batch):

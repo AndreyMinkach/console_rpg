@@ -1,10 +1,13 @@
 from pyglet.gl import *
+from pyglet.graphics import OrderedGroup
 
 import configs
 from Animation.storyboard import Storyboard
+from Gameplay.inventory import Inventory
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
+from Items.items_loader import ItemLoader
 from UI.renderer import Renderer
 from UI.ui_base import UIBase
 from UI.ui_button import UIButton
@@ -48,20 +51,13 @@ if __name__ == '__main__':
 
     input_helper = InputHelper(window)
 
-    temp_ui_text1 = UIText("Death weeks early had their and folly timed put. Hearted forbade on an village ye i"
-                           "n fifteen. Age attended betrayed her man raptures la",
-                           Vector2.zero, Vector2(300, 270), font_size=20, color=ColorHelper.BLACK)
-
-    temp_ui_text2 = UIText("Instrument terminated of as astonished literature motionless admiration. ",
-                           Vector2.zero, Vector2(400, 0), font_size=20, color=ColorHelper.WHITE)
+    temp_ui_text1 = UIText("Death weeks early had ", Vector2.zero, Vector2(300, 270))
 
     temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
                                Vector2(420, 350), Vector2(200, 60), color=(40, 50, 70, 255),
                                hover_color=(200, 50, 70, 255),
                                document_style=dict(color=(255, 255, 255, 255), align='center'))
     temp_ui_button1.size = Vector2(300, 80)
-
-    temp_base1 = UIBase(Vector2(100, 100), Vector2(300, 200), color=ColorHelper.GRAY)
 
     temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
     temp_container1.color = ColorHelper.GREEN[:3]
@@ -73,10 +69,22 @@ if __name__ == '__main__':
     temp_container1.add_child(temp_ui_button1)
 
     temp_container1.add_child(temp_ui_text1)
+    enemy_invent = Inventory()
+    all_items = ItemLoader()
+    weapon2 = all_items.get_item_by_id(2)
+    weapon1 = all_items.get_item_by_id(1)
 
-    ui_invent = UIInventory(Vector2(0, 100), Vector2(400, 300))
+    outfit3 = all_items.get_item_by_id(52)
+    enemy_invent.add_item(weapon1)
+    enemy_invent.add_item(outfit3)
+    enemy_invent.add_item(weapon2)
+    enemy_invent.add_item(outfit3)
 
-    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120))
+    ui_invent = UIInventory(Vector2(10, 100), Vector2(400, 300), enabled=True)
+    ui_invent.show_inventory(enemy_invent)
+
+    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
+                           scale=1.0)
     temp_container1.add_child(temp_sprite)
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
