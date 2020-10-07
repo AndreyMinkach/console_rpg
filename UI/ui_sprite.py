@@ -5,7 +5,7 @@ from UI.ui_base import *
 
 class UISprite(UIBase):
     def __init__(self, image_path: str, position: Vector2, size: Vector2, row: int, col: int, frame_number: int,
-                 sprite_size: Vector2, sheet_row: int, sheet_col: int, scale: float):
+                 sprite_size: Vector2, sheet_row: int, sheet_col: int, scale: float, frame_time: float = 0.1):
         super().__init__(position, size, transparent=True)
         image = pyglet.image.load('Static/Images/' + image_path)
         sprite_grid = pyglet.image.ImageGrid(image, sheet_row, sheet_col, item_width=sprite_size.x,
@@ -15,7 +15,7 @@ class UISprite(UIBase):
         sprite_texture = pyglet.image.TextureGrid(sprite_grid)
         start_sprite = (row * row_image_sprite_number) + col
         sprite_animation = pyglet.image.Animation.from_image_sequence(
-            sprite_texture[start_sprite: start_sprite + frame_number], 0.1, loop=True)
+            sprite_texture[start_sprite: start_sprite + frame_number], frame_time, loop=True)
         self.sprite = pyglet.sprite.Sprite(sprite_animation, x=position.x, y=position.y, batch=self.batch,
                                            group=OrderedGroup(self.group.order + 1))
         self.sprite.update(scale=scale)
