@@ -1,6 +1,8 @@
 import types
+from typing import List
 
 import pyglet
+from pyglet.graphics import Batch, OrderedGroup
 from pyglet.sprite import Sprite
 
 from Animation.number_field_animation import NumberFieldAnimation
@@ -18,9 +20,11 @@ class UIBase(Sprite):
         super().__init__(image, x=position.x, y=position.y, batch=Renderer.instance.get_batch(),
                          group=Renderer.instance.get_main_group())
 
-        self.enabled = True
-        self.children = []
-        self.children.append(self)
+        self._enabled = True
+        self._current_batch = self.batch
+        self.children: List[UIBase] = []
+        self.children_batch = Batch()
+        self.children_group = OrderedGroup(self.group.order + 1)
         self._position = position
         self._size = size
         self.custom_data = None  # can contain some data to simplify data transfer between scripts
@@ -41,9 +45,12 @@ class UIBase(Sprite):
 
     @position.setter
     def position(self, value: Vector2):
-        self._position = value
         self.x = value.x
         self.y = value.y
+        pos_difference = value - self.position
+        for i in self.children:
+            i.position = i.position + pos_difference
+        self._position = value
 
     @property
     def size(self):
@@ -51,16 +58,55 @@ class UIBase(Sprite):
 
     @size.setter
     def size(self, value: Vector2):
+        self.scale_x = value.x / float(self._size.x)
+        self.scale_y = value.y / float(self._size.y)
         self._size = value
-        # TODO: Implement object scaling
+
+    @Sprite.batch.setter
+    def batch(self, value: Batch):
+        Sprite.batch.fset(self, value)
+        self._current_batch = value
+        self.set_enabled(self._enabled)
+
+    @Sprite.group.setter
+    def group(self, value: OrderedGroup):
+        Sprite.group.fset(self, value)
+        self.children_group = OrderedGroup(value.order + 1)
+        for i in self.children:
+            i.group = self.children_group
+
+    def set_enabled(self, enable: bool):
+        self._enabled = enable
+        Sprite.batch.fset(self, self._current_batch if enable else None)
+        for i in self.children:
+            i.batch = self.children_batch if enable else None
+
+    def get_enabled(self) -> bool:
+        return self._enabled
+
+    def add_child(self, child: 'UIBase'):
+        child.parent = self
+        child.batch = self.children_batch
+        child.group = self.children_group
+        self.children.append(child)
+
+    def remove_child(self, child: 'UIBase'):
+        self._remove_child(child)
+
+    def _remove_child(self, child: 'UIBase', only_detach: bool = False):
+        child.parent = None
+        child.batch = Renderer.instance.get_batch()
+        child.group = Renderer.instance.get_main_group()
+        if not only_detach:
+            self.children.remove(child)
+
+    def clear_children(self):
+        for child in self.children:
+            self._remove_child(child, True)
+        self.children.clear()
 
     def update_logic(self, **kwargs):
-        if self.enabled:
-            # for child in self.children:
-            #     if isinstance(child, UIBase):
-            #         child.draw()
-            # self.draw()
-
+        if self._enabled:
             # update mouse events
             mouse_pos = InputHelper.instance.get_mouse_pos()
             if self.on_mouse_enter is not None and isinstance(self.on_mouse_enter, types.LambdaType):
@@ -79,7 +125,7 @@ class UIBase(Sprite):
     def _update_click_event(self, click_lambda, click_type: int, mouse_pos: Vector2):
         """
         :param click_lambda: lambda which is called when user clicks on ui object
-        :param click_type: 1 - user pressed down mouse button, 0 - user releases mouse button
+        :param click_type: 1 - user presses down mouse button, 0 - user releases mouse button
         :param mouse_pos: position of the cursor relative to the window
         """
         if click_lambda is not None and isinstance(click_lambda, types.LambdaType):
@@ -89,7 +135,7 @@ class UIBase(Sprite):
                 click_lambda(self, button)
 
     def is_point_inside(self, point: Vector2):
-        lb_corner = self.position if self.parent is None else self.position - self.parent.position
+        lb_corner = self.position
         ru_corner = lb_corner + self.size
         return lb_corner.x <= point.x <= ru_corner.x and lb_corner.y <= point.y <= ru_corner.y
 

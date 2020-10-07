@@ -14,12 +14,9 @@ class ScrollableContainer(UIBase):
         Renderer.instance.add_ui_object_scissor(self)
 
         self.children_margin = Vector2.zero
-        self._child_batch = Batch()
-        self._child_group = OrderedGroup(self.group.order + 1)
         self._viewer_extent = Vector2.zero  # the total area occupied by all child elements
         self._vertical_offset = 0
         self._offset_value = offset_value
-        self._children = []
         self._was_scissor_enabled = False
 
     def _enable_scissor_test(self):
@@ -33,33 +30,19 @@ class ScrollableContainer(UIBase):
             gl.glDisable(gl.GL_SCISSOR_TEST)
         gl.glPopAttrib()
 
-    def add_child(self, child: UIBase):
-        child.parent = self
-        child.batch = self._child_batch
-        child.group = self._child_group
-        self._children.append(child)
+    def add_child(self, child: 'UIBase'):
+        child.set_enabled(self.get_enabled())
+        super().add_child(child)
         self._calculate_viewer_extent()
 
-    def remove_child(self, child: UIBase):
-        self._remove_child(child)
-
-    def _remove_child(self, child: UIBase, only_detach: bool = False):
-        child.parent = None
-        child.batch = Renderer.instance.get_batch()
-        child.group = Renderer.instance.get_main_group()
-        if not only_detach:
-            self._children.remove(child)
+    def remove_child(self, child: 'UIBase'):
+        super().remove_child(child)
         self._calculate_viewer_extent()
-
-    def clear_children(self):
-        for child in self._children:
-            self._remove_child(child, True)
-        self._children.clear()
 
     def _calculate_viewer_extent(self):
         extent_x, extent_y = (0, 0)
-        child_number = len(self._children)
-        for child in self._children:
+        child_number = len(self.children)
+        for child in self.children:
             extent_x = max(child.size.x, extent_x)
             extent_y += child.size.y
         self._viewer_extent = Vector2(extent_x, extent_y + self.children_margin.y * child_number)
@@ -67,19 +50,21 @@ class ScrollableContainer(UIBase):
 
     def update_logic(self, **kwargs):
         self._enable_scissor_test()
-        super().update_logic()
-        self._update_scroll()
+        if self.get_enabled():
+            super().update_logic()
+            self._update_scroll()
 
-        viewer_height = 0  # stores a total height of viewer as if the children were placed one behind the other
-        for i in range(len(self._children) - 1, -1, -1):
-            child = self._children[i]
-            if isinstance(child, UIBase):
-                viewer_height += self.children_margin.y
-                child.position = self.position + Vector2(self.children_margin.x, viewer_height + self._vertical_offset)
-                child.update_logic()
-                viewer_height += child.size.y
+            viewer_height = 0  # stores a total height of viewer as if the children were placed one behind the other
+            for i in range(len(self.children) - 1, -1, -1):
+                child = self.children[i]
+                if isinstance(child, UIBase):
+                    viewer_height += self.children_margin.y
+                    child.position = self.position + Vector2(self.children_margin.x,
+                                                             int(viewer_height + self._vertical_offset))
+                    child.update_logic()
+                    viewer_height += child.size.y
 
-        self._child_batch.draw()
+            self.children_batch.draw()
 
         self._disable_scissor_test()
 
