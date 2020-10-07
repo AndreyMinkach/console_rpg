@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
                                Vector2(420, 350), Vector2(200, 60), color=(40, 50, 70, 255),
-                               hover_color=(200, 50, 70, 150),
+                               hover_color=(200, 50, 70, 255),
                                document_style=dict(color=(255, 255, 255, 255), align='center'))
     temp_ui_button1.size = Vector2(300, 80)
 
@@ -66,6 +66,9 @@ if __name__ == '__main__':
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
+    print(temp_ui_button1.batch)
+    temp_container1.add_child(temp_ui_button1)
+    print(temp_ui_button1.batch)
 
     temp_container1.add_child(temp_ui_text1)
     enemy_invent = Inventory()

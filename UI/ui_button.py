@@ -19,8 +19,8 @@ class UIButton(UIBase):
         self._caption = caption
         self._document = FormattedDocument(caption)
         self.update_document_style(document_style)
-        self._text_layout = TextLayout(self._document, width=size.x, height=size.y, batch=self.batch,
-                                       group=OrderedGroup(self.group.order + 1), wrap_lines=True, multiline=True)
+        self._text_layout = TextLayout(self._document, width=size.x, batch=self.batch, height=size.y, wrap_lines=True, multiline=True)
+        self._update_text_layout_groups(self.group)
         self._text_layout.content_valign = 'center'
         self.position = position
         self._background_color = color
@@ -43,10 +43,15 @@ class UIButton(UIBase):
         UIBase.batch.fset(self, value)
         self._text_layout.batch = value
 
+    def _update_text_layout_groups(self, group: OrderedGroup):
+        self._text_layout.begin_update()
+        self._text_layout._init_groups(OrderedGroup(group.order + 1))
+        self._text_layout.end_update()
+
     @UIBase.group.setter
     def group(self, value: OrderedGroup):
         UIBase.group.fset(self, value)
-        self._text_layout.group = OrderedGroup(self.group.order + 1)
+        self._update_text_layout_groups(value)
 
     @UIBase.position.setter
     def position(self, value: Vector2):
@@ -65,6 +70,12 @@ class UIButton(UIBase):
         UIBase.color.fset(self, value[:3])
         self._background_color = value
         self.opacity = value[3]
+
+    def set_enabled(self, enable: bool):
+        super().set_enabled(enable)
+        self._text_layout.begin_update()
+        self._text_layout.batch = self.batch
+        self._text_layout.end_update()
 
     def _set_background_color(self, color: (int, int, int, int)):
         UIBase.color.fset(self, color[:3])
