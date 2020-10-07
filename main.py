@@ -70,9 +70,7 @@ if __name__ == '__main__':
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
     temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
-    print(temp_ui_button1.batch)
     temp_container1.add_child(temp_ui_button1)
-    print(temp_ui_button1.batch)
 
     temp_container1.add_child(temp_ui_text1)
 

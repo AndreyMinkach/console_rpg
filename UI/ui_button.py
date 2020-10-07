@@ -73,9 +73,7 @@ class UIButton(UIBase):
 
     def set_enabled(self, enable: bool):
         super().set_enabled(enable)
-        self._text_layout.begin_update()
         self._text_layout.batch = self.batch
-        self._text_layout.end_update()
 
     def _set_background_color(self, color: (int, int, int, int)):
         UIBase.color.fset(self, color[:3])

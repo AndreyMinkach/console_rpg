@@ -31,7 +31,7 @@ class ScrollableContainer(UIBase):
         gl.glPopAttrib()
 
     def add_child(self, child: 'UIBase'):
-        child.set_enabled(self.get_enabled())
+        child.set_enabled(self.get_enabled() & child.get_enabled())
         super().add_child(child)
         self._calculate_viewer_extent()
 
