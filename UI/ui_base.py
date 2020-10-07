@@ -94,7 +94,7 @@ class UIBase(Sprite):
 
     def add_child(self, child: 'UIBase'):
         child.parent = self
-        child.batch = self.children_batch
+        child.batch = self.children_batch if child.get_enabled() else None
         child.group = self.children_group
         self.children.append(child)
 
