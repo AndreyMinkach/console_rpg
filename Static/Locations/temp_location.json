@@ -1,0 +1,25 @@
+[
+  {
+    "id": "some_cave_location",
+    "name": "The Deepest Hole",
+    "relationship": [],
+    "location_points": [
+      {
+        "id": "0",
+        "name": "",
+        "type": "arena",
+        "creatures": [],
+        "chests": [],
+        "relationship": ["1"]
+      },
+      {
+        "id": "1",
+        "name": "",
+        "type": "arena",
+        "creatures": [],
+        "chests": [],
+        "relationship": ["0", "2"]
+      }
+    ]
+  }
+]

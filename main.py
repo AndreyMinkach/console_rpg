@@ -3,6 +3,8 @@ from pyglet.graphics import OrderedGroup
 
 import configs
 from Animation.storyboard import Storyboard
+from Gameplay.Location.location_manager import LocationManager
+from Gameplay.Quests.quest_manager import QuestManager
 from Gameplay.inventory import Inventory
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
@@ -18,6 +20,8 @@ from UI.ui_text import UIText
 
 renderer = Renderer()
 storyboard = Storyboard()
+quest_manager = QuestManager()
+location_manager = LocationManager()
 
 
 class MyWindow(pyglet.window.Window):
