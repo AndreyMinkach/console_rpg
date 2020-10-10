@@ -1,24 +1,64 @@
 [
   {
-    "id": "some_cave_location",
     "name": "The Deepest Hole",
-    "relationship": [],
+    "connections": [],
+    "map_image_path": "",
     "location_points": [
       {
         "id": "0",
         "name": "",
         "type": "arena",
+        "rect": "100, 50, 150, 100",
+        "image_path": "",
         "creatures": [],
-        "chests": [],
-        "relationship": ["1"]
+        "chests": [
+          {
+            "rect": "300, 100, 400, 100",
+            "loot": [
+              {
+                "id": 0,
+                "count": 1
+              },
+              {
+                "id": 50,
+                "count": 2
+              }
+            ]
+          }
+        ],
+        "interactive_objects": [
+          {
+            "type": "book",
+            "rect": "300, 100, 500, 300"
+          }
+        ],
+        "connections": [
+          "1"
+        ]
       },
       {
         "id": "1",
         "name": "",
         "type": "arena",
+        "rect": "200, 200, 250, 250",
+        "image_path": "",
         "creatures": [],
-        "chests": [],
-        "relationship": ["0", "2"]
+        "chests": [
+          {
+            "rect": "300, 100, 400, 100",
+            "loot": []
+          }
+        ],
+        "interactive_objects": [
+          {
+            "type": "book",
+            "rect": "300, 100, 500, 300"
+          }
+        ],
+        "connections": [
+          "0",
+          "2"
+        ]
       }
     ]
   }

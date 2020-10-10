@@ -41,7 +41,7 @@ class ScrollableContainer(UIBase):
 
     def clear_children(self):
         for child in self.children:
-            self.remove_child(child, True)
+            self._remove_child(child, True)
             child.delete()
         self.children.clear()
 
