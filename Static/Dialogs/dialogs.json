@@ -1,0 +1,90 @@
+[
+  {
+    "id": "main_storyline",
+    "interlocutor": "Name",
+    "activator": [],
+    "phrases": [
+      {
+        "id": "0",
+        "variables_to_set": {
+          "some_variable": false
+        },
+        "phrase_text": "Hello",
+        "answer_text": "What brings you here?",
+        "phrases": [
+          {
+            "id": "0_1",
+            "variables_to_set": {
+              "some_variable": false,
+              "have_item": true
+            },
+            "phrase_text": "Tell me smt",
+            "answer_text": "Tell me a lot",
+            "phrases": [
+              {
+                "id": "0_1_1",
+                "variables_to_set": {},
+                "phrase_text": "Tell me smt1",
+                "answer_text": "Tell me a lot1",
+                "phrases": [],
+                "activator": []
+              },
+              {
+                "id": "0_1_2",
+                "variables_to_set": {},
+                "phrase_text": "Tell me smt2",
+                "answer_text": "Tell me a lot2",
+                "phrases": [],
+                "activator": []
+              },
+              {
+                "id": "0_1_3",
+                "variables_to_set": {},
+                "phrase_text": "Tell me smt3",
+                "answer_text": "Tell me a lot3",
+                "phrases": [],
+                "activator": []
+              }
+            ],
+            "activator": []
+          },
+          {
+            "id": "0_2",
+            "variables_to_set": {},
+            "phrase_text": "main_storyline hello2",
+            "answer_text": "main_storyline hello answer2",
+            "phrases": [],
+            "activator": []
+          }
+        ]
+      },
+      {
+        "id": "1",
+        "variables_to_set": {
+          "some_variable": true,
+          "have_item": true
+        },
+        "phrase_text": "Hello1",
+        "answer_text": "What brings you here?1",
+        "phrases": [
+          {
+            "id": "1_1",
+            "variables_to_set": {},
+            "phrase_text": "Tell me smt1",
+            "answer_text": "Tell me a lot1",
+            "phrases": [],
+            "activator": []
+          },
+          {
+            "id": "1_2",
+            "variables_to_set": {},
+            "phrase_text": "main_storyline hello1",
+            "answer_text": "main_storyline hello answer1",
+            "phrases": [],
+            "activator": []
+          }
+        ]
+      }
+    ]
+  }
+]
