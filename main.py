@@ -28,9 +28,10 @@ if __name__ == '__main__':
     window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
                       vsync=True)
 
-    q = dialogue_manager.get_dialog_by_interlocutor('Name')
     input_helper = InputHelper(window)
 
+    # dialog = dialogue_manager.get_dialog_by_interlocutor('Name1')
+    # dialog.chose_phrase('0')
     # temp_ui_text1 = UIText("Death weeks early had ", Vector2.zero, Vector2(300, 270))
 
     # temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
@@ -61,15 +62,13 @@ if __name__ == '__main__':
     enemy_invent.add_item(outfit3)
 
     ui_invent = UIInventory(Vector2(10, 150), Vector2(400, 300), enabled=False)
-    ui_invent.show_inventory(enemy_invent)
+    # ui_invent.show_inventory(enemy_invent)
 
     ui_dialogue = UIDialogue(Vector2(10, 10), Vector2(500, 130), 'Name')
 
     # temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
     #                       scale=1.0)
     # temp_container1.add_child(temp_sprite)
-    q = []
-    for i in range(len(q) - 1, -1, -1):
-        print(i, q[i])
+
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

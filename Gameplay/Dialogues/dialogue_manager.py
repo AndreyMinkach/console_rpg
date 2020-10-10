@@ -4,58 +4,51 @@ from Gameplay.Quests.quest_manager import QuestManager
 from Helpers.json_loader import JsonLoader
 
 
+def all_activators_true(list_of_activators: list):
+    if len(list_of_activators) == 0:
+        return True
+    for activator in list_of_activators:
+        if not activator:
+            return False
+    return True
+
+
 class Dialog:
     def __init__(self):
-        self.temp_dict_ans = {}
-        self._active_dialog = None
         self.phrases = []
-        self.q = {}
-        self.phrases = []
-    # def get_next_phrases(self, answer_id: str):
-    #     # QuestManager.instance.set_quest_variable('some_variable', True)
-    #     for phrase in self.phrases:
-    #         print(self.phrases)
-    #         if phrase['id'] == answer_id:
-    #             self._phrase_choice = phrase
-    #     self._available_phrases = self.phrases
-    #     self.temp_dict_ans = []
-    #     for phrase in self._phrase_choice['phrases']:
-    #         self.temp_dict_ans.append(phrase['phrase_text'])
-    #     self.my_phrase = self._phrase_choice["phrase_text"]
-    #     self.interlocutor_phrase = self._phrase_choice["answer_text"]
-    #     print(r"\я кажу " + self.my_phrase + " " + self._phrase_choice['id'])
-    #     print("|мені відповідають " + self.interlocutor_phrase)
-    #     print("/варіанти відповіді ", self.temp_dict_ans)
-    #     print()
+        self.available_dialogs = []
+        self.available_phrases = []
 
-    def get_next_phrases(self):
-        # QuestManager.instance.set_quest_variable('some_variable', True)
-        for next_phrases in self.phrases:
-            self.temp_dict_ans[next_phrases['id']] = next_phrases['phrase_text']
-            self.q[next_phrases['id']] = next_phrases['phrase_text']
-        # print(self.q)
-            # self.temp_dict_ans(next_phrases['phrase_text'])
-        # print(self.temp_dict_ans)
+    def chose_phrase_by_id(self, phrase_id: str):
+        available_phrases = {}
+        available_dialogs = []
+        for dialog in self.available_dialogs:
+            if dialog['id'] == phrase_id and all_activators_true(dialog['activator']):
+                for phrase in dialog['phrases']:
+                    if all_activators_true(phrase['activator']):
+                        available_phrases[phrase['id']] = phrase['phrase_text']
+                        available_dialogs = dialog['phrases']
 
-    def choose_answer(self, choice_id: str):
-        second_dialog = Dialog()
-        q = {}
-        for chosen_phrase in self._active_dialog.__dict__['phrases']:
-            if chosen_phrase["id"] == choice_id:
-                q = chosen_phrase
-                break
-        second_dialog.__dict__.update(q)
-        self.phrases = second_dialog.phrases
-        self.__dict__.update(self._active_dialog.__dict__)
-        second_dialog.get_next_phrases()
-        self._active_dialog = second_dialog
-        self.temp_dict_ans = second_dialog.temp_dict_ans
+        self.available_phrases = available_phrases
+        self.available_dialogs = available_dialogs
+
+    def start_dialog(self):
+        available_phrases = {}
+        available_dialogs = []
+        for phrase in self.available_dialogs:
+            for sub_phrase in phrase['phrases']:
+                if all_activators_true(sub_phrase['activator']):
+                    available_phrases[sub_phrase['id']] = sub_phrase['phrase_text']
+                    available_dialogs = phrase['phrases']
+        self.available_phrases = available_phrases
+        self.available_dialogs = available_dialogs
 
 
 class DialogManager(JsonLoader):
-    instance = None
+    instance: 'DialogManager' = None
 
     def __init__(self):
+        self.__class__.instance = self
         dialog_json_verify_pattern = {"id": str, "interlocutor": str, "activator": list, "phrases": list}
         super().__init__('Static/Dialogs/', dialog_json_verify_pattern)
         self._dialogs_dictionary = {}
@@ -64,18 +57,17 @@ class DialogManager(JsonLoader):
 
     def _load_dialogs_from_json(self):
         for dialog_dict in self.loaded_element_list:
-            dialog_object = Dialog()
-            dialog_object.__dict__.update(dialog_dict)
-            self._dialogs_dictionary[dialog_dict['interlocutor']] = dialog_object
+            if dialog_dict['interlocutor'] in self._dialogs_dictionary.keys():
+                self._dialogs_dictionary[dialog_dict['interlocutor']].append(dialog_dict)
+            else:
+                self._dialogs_dictionary[dialog_dict['interlocutor']] = [dialog_dict]
 
-    def start_dialog(self, interlocutor: str) -> Dialog:
-        dialog = self.get_dialog_by_interlocutor(interlocutor)
-        temp_list = []
-        [temp_list.append(phrase) for phrase in dialog.phrases]
-        dialog.phrases = temp_list
-        dialog._active_dialog = dialog
-        dialog.get_next_phrases()
+    def get_dialog_by_interlocutor(self, interlocutor: str) -> Dialog:
+        available_dialogs = []
+        for dialog in self._dialogs_dictionary[interlocutor]:
+            if all_activators_true(dialog['activator']):
+                available_dialogs.append(dialog)
+        dialog = Dialog()
+        dialog.available_dialogs = available_dialogs
+        self._active_dialog = dialog
         return dialog
-
-    def get_dialog_by_interlocutor(self, interlocutor):
-        return self._dialogs_dictionary[interlocutor]

@@ -41,7 +41,7 @@ class ScrollableContainer(UIBase):
 
     def clear_children(self):
         for child in self.children:
-            self.remove_child(child)
+            self._remove_child(child, True)
             child.delete()
         self.children.clear()
 
@@ -67,7 +67,9 @@ class ScrollableContainer(UIBase):
             super().update_logic()
             self._update_scroll()
             viewer_height = 0  # stores a total height of viewer as if the children were placed one behind the other
+            # print(len(self.children))
             for i in range(len(self.children) - 1, -1, -1):
+                print(len(self.children), i)
                 child = self.children[i]
                 if isinstance(child, UIBase):
                     viewer_height += self.children_margin.y
