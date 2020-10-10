@@ -41,13 +41,14 @@ class ScrollableContainer(UIBase):
 
     def clear_children(self):
         for child in self.children:
-            self.remove_child(child, True)
+            self.remove_child(child)
             child.delete()
         self.children.clear()
 
     def delete_children(self):
         for child in self.children:
             child.batch = None
+            Renderer.instance.remove_ui_object(child)
         self.children.clear()
         del self.children[:]
 
@@ -65,7 +66,6 @@ class ScrollableContainer(UIBase):
         if self.get_enabled():
             super().update_logic()
             self._update_scroll()
-
             viewer_height = 0  # stores a total height of viewer as if the children were placed one behind the other
             for i in range(len(self.children) - 1, -1, -1):
                 child = self.children[i]
@@ -75,9 +75,7 @@ class ScrollableContainer(UIBase):
                                                              int(viewer_height + self._vertical_offset))
                     child.update_logic()
                     viewer_height += child.size.y
-
             self.children_batch.draw()
-
         self._disable_scissor_test()
 
     def _update_scroll(self):

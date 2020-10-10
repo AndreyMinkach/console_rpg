@@ -1,8 +1,7 @@
-from pyglet.gl import *
-from pyglet.graphics import OrderedGroup
 
-import configs
 from Animation.storyboard import Storyboard
+from Gameplay.Dialogues.dialogue_manager import DialogManager
+from Gameplay.Quests.quest_manager import QuestManager
 from Gameplay.inventory import Inventory
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
@@ -11,64 +10,45 @@ from Items.items_loader import ItemLoader
 from UI.renderer import Renderer
 from UI.ui_base import UIBase
 from UI.ui_button import UIButton
+from UI.ui_dialog import UIDialogue
 from UI.ui_inventory import UIInventory
 from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_sprite import UISprite
 from UI.ui_text import UIText
+from UI.window import MyWindow
+from pyglet.gl import *
+import configs
 
 renderer = Renderer()
 storyboard = Storyboard()
-
-
-class MyWindow(pyglet.window.Window):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_minimum_size(400, 300)
-        self.total_ticks = 0
-
-    def on_activate(self):
-        glClearColor(*[i / 255.0 for i in ColorHelper.DARK])
-        glEnable(GL_TEXTURE_2D)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-    def on_draw(self):
-        self.clear()
-        renderer.draw()
-
-    def update(self, dt):
-        renderer.update_logic()
-
-        # input helper should be updated after all other logic
-        InputHelper.instance.update()
-        self.total_ticks += 1
-        if self.total_ticks > 1000:
-            self.total_ticks -= 1000
-
+quest_manager = QuestManager()
+dialogue_manager = DialogManager()
 
 if __name__ == '__main__':
     window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=True,
                       vsync=True)
 
+    q = dialogue_manager.get_dialog_by_interlocutor('Name')
     input_helper = InputHelper(window)
 
-    temp_ui_text1 = UIText("Death weeks early had ", Vector2.zero, Vector2(300, 270))
+    # temp_ui_text1 = UIText("Death weeks early had ", Vector2.zero, Vector2(300, 270))
 
-    temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
-                               Vector2(420, 350), Vector2(200, 60), color=(40, 50, 70, 255),
-                               hover_color=(200, 50, 70, 255),
-                               document_style=dict(color=(255, 255, 255, 255), align='center'))
-    temp_ui_button1.size = Vector2(300, 80)
+    # temp_ui_button1 = UIButton("Instrument terminated of as astonished literature motionless admiration.",
+    #                            Vector2(420, 350), Vector2(200, 60), color=(40, 50, 70, 255),
+    #                            hover_color=(200, 50, 70, 255),
+    #                            document_style=dict(color=(255, 255, 255, 255), align='center'))
+    # temp_ui_button1.size = Vector2(300, 80)
 
-    temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
-    temp_container1.color = ColorHelper.GREEN[:3]
-    temp_container1.children_margin = Vector2(10, 10)
-    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.BLACK))
-    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
-    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
-    temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
-    temp_container1.add_child(temp_ui_button1)
+    # temp_container1 = ScrollableContainer(Vector2(600, 100), Vector2(300, 200))
+    # temp_container1.color = ColorHelper.GREEN[:3]
+    # temp_container1.children_margin = Vector2(10, 10)
+    # temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.BLACK))
+    # temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 50), color=ColorHelper.PINK))
+    # temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 60), color=ColorHelper.LIGHT_BLUE))
+    # temp_container1.add_child(UIBase(Vector2.zero, Vector2(50, 40), color=ColorHelper.YELLOW))
+    # temp_container1.add_child(temp_ui_button1)
 
-    temp_container1.add_child(temp_ui_text1)
+    # temp_container1.add_child(temp_ui_text1)
     enemy_invent = Inventory()
     all_items = ItemLoader()
     weapon2 = all_items.get_item_by_id(2)
@@ -80,12 +60,16 @@ if __name__ == '__main__':
     enemy_invent.add_item(weapon2)
     enemy_invent.add_item(outfit3)
 
-    ui_invent = UIInventory(Vector2(10, 100), Vector2(400, 300), enabled=True)
+    ui_invent = UIInventory(Vector2(10, 150), Vector2(400, 300), enabled=False)
     ui_invent.show_inventory(enemy_invent)
 
-    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
-                           scale=1.0)
-    temp_container1.add_child(temp_sprite)
+    ui_dialogue = UIDialogue(Vector2(10, 10), Vector2(500, 130), 'Name')
 
+    # temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
+    #                       scale=1.0)
+    # temp_container1.add_child(temp_sprite)
+    q = []
+    for i in range(len(q) - 1, -1, -1):
+        print(i, q[i])
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

@@ -18,7 +18,7 @@ class UIInventory(UIBase):
 
         all_items = ItemLoader()
         hero_invent = Inventory()
-        self._child_group = OrderedGroup(self.group.order + 0.2)
+        self._child_group = OrderedGroup(self.group.order + 1)
         self._enabled = enabled
         self.button_size = Vector2(185, 50)
         self.set_enabled(False)
@@ -62,8 +62,8 @@ class UIInventory(UIBase):
         self.my_inv_button.group = self._child_group
         self.my_inv_button.custom_data = hero_invent
 
-        self.other_inv_button.on_click_up = lambda o, b: self.choose_inventory(o, self.item_list_container)
-        self.my_inv_button.on_click_up = lambda o, b: self.choose_inventory(o, self.item_list_container)
+        self.other_inv_button.on_click_up = lambda o, b: self.choose_inventory(o)
+        self.my_inv_button.on_click_up = lambda o, b: self.choose_inventory(o)
 
         self.chosen_invent = hero_invent
         # coordinate on image
@@ -85,8 +85,8 @@ class UIInventory(UIBase):
                 self.show_items_by_type(item_type_name_list[o.custom_data], self.chosen_invent)
             weapon_type_sprite.set_enabled(False)
 
-    def choose_inventory(self, o: UIBase, item_list_container: ScrollableContainer):
-        item_list_container.delete_children()
+    def choose_inventory(self, o: UIBase):
+        self.item_list_container.delete_children()
         self.chosen_invent = o.custom_data
 
     def show_items_by_type(self, items_type: str, invent: Inventory):
