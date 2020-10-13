@@ -22,12 +22,12 @@ class HitTest:
         while color in values:
             color = (randint(0, 255), randint(0, 255), randint(0, 255))
 
-        self._color_object_dict[color] = ui_object
+        self.add_ui_object(color, ui_object)
         return color
 
     def add_ui_object(self, color: (int, int, int), ui_object):
         self._color_object_dict[color] = ui_object
-        self._ui_object_list_sorted = sorted(self._color_object_dict.values(), key=lambda o: o.group.order)
+        self.insert_ui_object(ui_object)
 
     def remove_ui_object(self, color: (int, int, int)):
         del self._color_object_dict[color]
@@ -35,9 +35,9 @@ class HitTest:
     def insert_ui_object(self, ui_object):
         values = list(self._color_object_dict.values())
         insert_index = -1
-        for i in range(len(values)):
-            if values[i].group.order > ui_object.group.order:
-                insert_index = i
+        for i in range(len(values) - 1, -1, -1):
+            if ui_object.group.order > values[i].group.order:
+                insert_index = i + 1
                 break
         if insert_index == -1:
             values.append(ui_object)
@@ -77,13 +77,16 @@ class HitTest:
         if buffer_tuple in self._color_object_dict:
             ui_object = self._color_object_dict[buffer_tuple]
             if self._current_ui_object != ui_object:
-                ui_object.on_mouse_enter(ui_object)
+                if ui_object.get_enabled() is True:
+                    ui_object.on_mouse_enter(ui_object)
                 if self._current_ui_object is not None:
-                    self._current_ui_object.on_mouse_leave(self._current_ui_object)
+                    if self._current_ui_object.get_enabled() is True:
+                        self._current_ui_object.on_mouse_leave(self._current_ui_object)
                 self._current_ui_object = ui_object
         else:
             if self._current_ui_object is not None:
-                self._current_ui_object.on_mouse_leave(self._current_ui_object)
+                if self._current_ui_object.get_enabled() is True:
+                    self._current_ui_object.on_mouse_leave(self._current_ui_object)
                 self._current_ui_object = None
 
         self.window.clear()
@@ -92,7 +95,8 @@ class HitTest:
         mouse_button_down = InputHelper.get_last_mouse_button_down()
         mouse_button_up = InputHelper.get_last_mouse_button_up()
         if self._current_ui_object is not None:
-            if mouse_button_down != -1:
-                self._current_ui_object.on_click_down(self._current_ui_object, mouse_button_down)
-            if mouse_button_up != -1:
-                self._current_ui_object.on_click_up(self._current_ui_object, mouse_button_up)
+            if self._current_ui_object.get_enabled() is True:
+                if mouse_button_down != -1:
+                    self._current_ui_object.on_click_down(self._current_ui_object, mouse_button_down)
+                if mouse_button_up != -1:
+                    self._current_ui_object.on_click_up(self._current_ui_object, mouse_button_up)
