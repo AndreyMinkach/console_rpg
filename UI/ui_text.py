@@ -2,10 +2,6 @@ from pyglet import font
 from pyglet.font.ttf import TruetypeInfo
 from pyglet.text.document import FormattedDocument
 from pyglet.text.layout import TextLayout
-from typing import Tuple
-
-from pyglet.graphics import Batch, Group, OrderedGroup
-from pyglet.text import Label
 from UI.ui_base import *
 
 
@@ -21,8 +17,7 @@ load_font('Static/Fonts/DisposableDroidBB.ttf')
 class UIText(UIBase):
     def __init__(self, caption: str, position: Vector2 = Vector2.zero, size: Vector2 = Vector2.one,
                  document_style=None, font_name: str = 'DisposableDroid BB', font_size: int = 20,
-                 tint_color: (int, int, int, int) = ColorHelper.WHITE,
-                 hover_color: (int, int, int, int) = ColorHelper.TRANSPARENT):
+                 tint_color: (int, int, int, int) = ColorHelper.WHITE):
         super().__init__(position, size)
         document_style = {} if document_style is None else document_style
         document_style.update(dict(font_name=font_name, font_size=font_size))
@@ -35,8 +30,6 @@ class UIText(UIBase):
         self._text_layout.content_valign = 'center'
         self.position = position
         self.color = tint_color
-        self._set_background_color(hover_color)
-        self._set_background_color(self._background_color)
 
     def set_text(self, text: str):
         self.my_label.text = text
@@ -77,12 +70,7 @@ class UIText(UIBase):
     @UIBase.color.setter
     def color(self, value: (int, int, int, int)):
         UIBase.color.fset(self, value[:3])
-        self._background_color = value
-        self.opacity = value[3]
-
-    def _set_background_color(self, color: (int, int, int, int)):
-        UIBase.color.fset(self, color[:3])
-        self.opacity = color[3]
+        self.opacity = value[3] if len(value) == 4 else 255
 
     def update_document_style(self, style: dict):
         if style is not None:
@@ -92,6 +80,3 @@ class UIText(UIBase):
         self._text_layout.begin_update()
         self._text_layout._init_groups(OrderedGroup(group.order + 1))
         self._text_layout.end_update()
-
-    def update_logic(self, **kwargs):
-        super().update_logic()

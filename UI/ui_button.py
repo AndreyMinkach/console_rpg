@@ -70,7 +70,7 @@ class UIButton(UIBase):
     def color(self, value: (int, int, int, int)):
         UIBase.color.fset(self, value[:3])
         self._background_color = value
-        self.opacity = value[3]
+        self.opacity = value[3] if len(value) == 4 else 255
 
     def set_enabled(self, enable: bool):
         super().set_enabled(enable)
