@@ -29,13 +29,5 @@ if __name__ == '__main__':
     hit_test = HitTest(window)
     input_helper = InputHelper(window)
 
-    temp_ui_text = UIText("SOme body wants told me the world is gonna....", Vector2(100, 100), Vector2(600, 30),
-                          tint_color=(255, 0, 0, 255))
-    temp_ui_button = UIButton("SOme body wants told me the world is gonna....", Vector2(100, 200), Vector2(600, 30),
-                              hover_color=(0, 50, 255, 255))
-
-    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
-                           scale=1.0)
-
     pyglet.clock.schedule(window.update)
     pyglet.app.run()

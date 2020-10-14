@@ -1,5 +1,4 @@
-from pyglet.graphics import Batch, Group, OrderedGroup
-
+from pyglet.graphics import Batch, OrderedGroup
 from UI.ui_base import *
 
 
@@ -26,7 +25,7 @@ class UISprite(UIBase):
         self.sprite.batch = value
 
     @UIBase.group.setter
-    def group(self, value: Group):
+    def group(self, value: OrderedGroup):
         UIBase.group.fset(self, value)
         self.sprite.group = value
 
