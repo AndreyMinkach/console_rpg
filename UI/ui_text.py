@@ -21,7 +21,7 @@ load_font('Static/Fonts/DisposableDroidBB.ttf')
 class UIText(UIBase):
     def __init__(self, caption: str, position: Vector2 = Vector2.zero, size: Vector2 = Vector2.one,
                  document_style=None, font_name: str = 'DisposableDroid BB', font_size: int = 20,
-                 color: (int, int, int, int) = ColorHelper.WHITE,
+                 tint_color: (int, int, int, int) = ColorHelper.WHITE,
                  hover_color: (int, int, int, int) = ColorHelper.TRANSPARENT):
         super().__init__(position, size)
         document_style = {} if document_style is None else document_style
@@ -34,7 +34,7 @@ class UIText(UIBase):
                                        group=OrderedGroup(self.group.order + 1.1), wrap_lines=True, multiline=True)
         self._text_layout.content_valign = 'center'
         self.position = position
-        self.color = color
+        self.color = tint_color
         self._set_background_color(hover_color)
         self._set_background_color(self._background_color)
 

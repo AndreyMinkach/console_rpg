@@ -48,12 +48,12 @@ class UIInventory(UIBase):
         button_click_color = (125, 125, 125, 180)
         self.my_inv_button = UIButton("My inventory", Vector2(position.x + indent, position.y + indent),
                                       Vector2(self.button_size.x, self.button_size.y), font_size=20,
-                                      color=ColorHelper.GRAY, hover_color=button_click_color,
+                                      tint_color=ColorHelper.GRAY, hover_color=button_click_color,
                                       document_style=dict(align='center'))
         self.other_inv_button = UIButton("Someone\ninventory",
                                          Vector2(position.x + size.x - indent - self.button_size.x,
                                                  position.y + indent), self.button_size, font_size=20,
-                                         color=ColorHelper.GRAY, hover_color=button_click_color,
+                                         tint_color=ColorHelper.GRAY, hover_color=button_click_color,
                                          document_style=dict(align='center'))
 
         self.my_inv_button.set_enabled(False)
@@ -97,7 +97,7 @@ class UIInventory(UIBase):
         background_color = ColorHelper.GRAY
         for item in invent.get_item_list_by_type(items_type):
             item_text = UIText(item.name, Vector2.zero, Vector2(self.item_list_container.size.x - indent, one_line_high),
-                               font_size=20, color=background_color, document_style=text_color)
+                               font_size=20, tint_color=background_color, document_style=text_color)
             item_text._update_text_layout_groups(self._child_group)
             self.item_list_container.add_child(item_text)
         self.item_list_container.group = self._child_group
