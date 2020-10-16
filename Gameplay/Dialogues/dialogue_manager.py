@@ -6,66 +6,62 @@ from Gameplay.Quests.quest_manager import QuestManager
 from Helpers.json_loader import JsonLoader
 
 
-def all_activators_true(list_of_activators: list):
+def check_activators(list_of_activators: list):
     if len(list_of_activators) == 0:
         return True
     for activator in list_of_activators:
         if not QuestManager.instance.get_quest_variable(activator):
-            print(QuestManager.instance.get_quest_variable(activator), activator)
             return False
     return True
 
 
-def activate_variables(variables: dict):
-    for variable, value in variables.items():
-        QuestManager.instance.set_quest_variable(variable, value)
-
-
-def random_bye_phrase():
-    list_of_bye_phrases = ['goodbye', 'прощавай', 'попутного вітру', 'давай до свіданія']
-    return random.choice(list_of_bye_phrases)
-
 class Dialog:
     def __init__(self):
-        self.phrases = []
-        self.available_phrases = []
-        self.phrase_text = {}
-        self.phrase_answer = ''
+        self.list_of_phrases = []
+        self.dict_of_answers = {}
+        self.interlocutor_answer = ''
         self.first_phrases = None
         self.first_dialogs = None
 
     def chose_phrase_by_id(self, phrase_id: str = ''):
         phrase_text = {}
-
-        for phrase in self.phrases:
-            if phrase['id'] == phrase_id and all_activators_true(phrase['activator']):
-                self.phrases = phrase['phrases']
-                activate_variables(phrase['variables_to_set'])
+        for phrase in self.list_of_phrases:
+            if phrase['id'] == phrase_id and check_activators(phrase['activator']):
+                self.interlocutor_answer = phrase['answer_text']
+                self.list_of_phrases = phrase['phrases']
+                self.activate_variables(phrase['variables_to_set'])
                 for future_phrase in phrase['phrases']:
-                    if all_activators_true(future_phrase['activator']):
+                    if check_activators(future_phrase['activator']):
                         phrase_text[future_phrase['id']] = future_phrase['phrase_text']
-                        self.phrase_answer = phrase['answer_text']
 
-            elif phrase_id == '' and all_activators_true(phrase['activator']):
+            elif phrase_id == '' and check_activators(phrase['activator']):
                 phrase_text[phrase['id']] = phrase['phrase_text']
-                self.first_dialogs = self.phrases
+                self.first_dialogs = self.list_of_phrases
 
         if phrase_text == {}:
             phrase_text = self.first_phrases
-            self.phrases = self.first_dialogs
-            phrase_text['goodbye'] = random_bye_phrase()
+            self.list_of_phrases = self.first_dialogs
+            phrase_text['goodbye'] = self.get_random_bye_phrase()
 
         if phrase_id == '':
-            phrase_text['goodbye'] = random_bye_phrase()
+            phrase_text['goodbye'] = self.get_random_bye_phrase()
             self.first_phrases = phrase_text
-        self.phrase_text = phrase_text
+        self.dict_of_answers = phrase_text
+
+    def activate_variables(self, variables: dict):
+        for variable, value in variables.items():
+            QuestManager.instance.set_quest_variable(variable, value)
+
+    def get_random_bye_phrase(self):
+        list_of_bye_phrases = ['goodbye', 'прощавай', 'попутного вітру', 'давай до свіданія']
+        return random.choice(list_of_bye_phrases)
 
 
 class DialogManager(JsonLoader):
-    instance: 'DialogManager' = None
+    _instance: 'DialogManager' = None
 
     def __init__(self):
-        self.__class__.instance = self
+        self.__class__._instance = self
         dialog_json_verify_pattern = {"id": str, "interlocutor": str, "activator": list, "phrases": list}
         super().__init__('Static/Dialogs/', dialog_json_verify_pattern)
         self._dialogs_dictionary = {}
@@ -79,12 +75,13 @@ class DialogManager(JsonLoader):
             else:
                 self._dialogs_dictionary[dialog_dict['interlocutor']] = [dialog_dict]
 
-    def get_dialog_by_interlocutor(self, interlocutor: str) -> Dialog:
+    @classmethod
+    def get_dialog_by_interlocutor(cls, interlocutor: str) -> Dialog:
         dialog_obj = Dialog()
-        for dialog in self._dialogs_dictionary[interlocutor]:
-            if all_activators_true(dialog['activator']):
-                dialog_obj.phrases += dialog['phrases']
+        for dialog in cls._instance._dialogs_dictionary[interlocutor]:
+            if check_activators(dialog['activator']):
+                dialog_obj.list_of_phrases += dialog['phrases']
         dialog_obj.interlocutor = interlocutor
-        dialog_obj.first_phrases = dialog_obj.phrases
-        self._active_dialog = dialog_obj
+        dialog_obj.first_phrases = dialog_obj.list_of_phrases
+        cls._instance._active_dialog = dialog_obj
         return dialog_obj

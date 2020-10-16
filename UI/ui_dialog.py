@@ -20,9 +20,9 @@ class UIDialog(UIBase):
         self.dialog_container.color = ColorHelper.LIGHT_BLUE[:3]
         self.dialog_container.group = self._child_group
 
-        self.dialog = DialogManager.instance.get_dialog_by_interlocutor(name)
+        self.dialog = DialogManager.get_dialog_by_interlocutor(name)
         self.dialog.chose_phrase_by_id()
-        self.show_next_phrases(self.dialog.phrase_text)
+        self.show_next_phrases(self.dialog.dict_of_answers)
 
     def show_next_phrases(self, dict_ans: dict):
         self.dialog_container.delete_children()
@@ -42,10 +42,10 @@ class UIDialog(UIBase):
             return
         self.dialog.chose_phrase_by_id(answer_id)
         self.dialog_container.delete_children()
-        ui_text = UIText(self.dialog.phrase_answer, Vector2(self.position.x + self.dialog_container.children_margin.x,
-                                                            self.position.y + self.size.x - self.dialog_container.children_margin.y),
+        ui_text = UIText(self.dialog.interlocutor_answer, Vector2(self.position.x + self.dialog_container.children_margin.x,
+                                                                  self.position.y + self.size.x - self.dialog_container.children_margin.y),
                          Vector2(self.dialog_container.width - self.dialog_container.children_margin.x * 2, 22),
                          document_style=dict(color=ColorHelper.GREEN))
         ui_text.group = self._child_group
         self.dialog_container.add_child(ui_text)
-        ui_text.on_click_down = lambda o, b: self.show_next_phrases(self.dialog.phrase_text)
+        ui_text.on_click_down = lambda o, b: self.show_next_phrases(self.dialog.dict_of_answers)
