@@ -62,7 +62,6 @@ class InputHelper:
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         self._mouse_pos = Vector2(x, y)
         self._mouse_pos_delta = Vector2(dx, dy)
-        print(x, y)
 
     @classmethod
     def get_mouse_scroll(cls) -> int:
