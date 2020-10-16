@@ -1,3 +1,5 @@
+import random
+
 import enum
 
 from Gameplay.Quests.quest_manager import QuestManager
@@ -8,40 +10,55 @@ def all_activators_true(list_of_activators: list):
     if len(list_of_activators) == 0:
         return True
     for activator in list_of_activators:
-        if not activator:
+        if not QuestManager.instance.get_quest_variable(activator):
+            print(QuestManager.instance.get_quest_variable(activator), activator)
             return False
     return True
 
 
+def activate_variables(variables: dict):
+    for variable, value in variables.items():
+        QuestManager.instance.set_quest_variable(variable, value)
+
+
+def random_bye_phrase():
+    list_of_bye_phrases = ['goodbye', 'прощавай', 'попутного вітру', 'давай до свіданія']
+    return random.choice(list_of_bye_phrases)
+
 class Dialog:
     def __init__(self):
         self.phrases = []
-        self.available_dialogs = []
         self.available_phrases = []
+        self.phrase_text = {}
+        self.phrase_answer = ''
+        self.first_phrases = None
+        self.first_dialogs = None
 
-    def chose_phrase_by_id(self, phrase_id: str):
-        available_phrases = {}
-        available_dialogs = []
-        for dialog in self.available_dialogs:
-            if dialog['id'] == phrase_id and all_activators_true(dialog['activator']):
-                for phrase in dialog['phrases']:
-                    if all_activators_true(phrase['activator']):
-                        available_phrases[phrase['id']] = phrase['phrase_text']
-                        available_dialogs = dialog['phrases']
+    def chose_phrase_by_id(self, phrase_id: str = ''):
+        phrase_text = {}
 
-        self.available_phrases = available_phrases
-        self.available_dialogs = available_dialogs
+        for phrase in self.phrases:
+            if phrase['id'] == phrase_id and all_activators_true(phrase['activator']):
+                self.phrases = phrase['phrases']
+                activate_variables(phrase['variables_to_set'])
+                for future_phrase in phrase['phrases']:
+                    if all_activators_true(future_phrase['activator']):
+                        phrase_text[future_phrase['id']] = future_phrase['phrase_text']
+                        self.phrase_answer = phrase['answer_text']
 
-    def start_dialog(self):
-        available_phrases = {}
-        available_dialogs = []
-        for phrase in self.available_dialogs:
-            for sub_phrase in phrase['phrases']:
-                if all_activators_true(sub_phrase['activator']):
-                    available_phrases[sub_phrase['id']] = sub_phrase['phrase_text']
-                    available_dialogs = phrase['phrases']
-        self.available_phrases = available_phrases
-        self.available_dialogs = available_dialogs
+            elif phrase_id == '' and all_activators_true(phrase['activator']):
+                phrase_text[phrase['id']] = phrase['phrase_text']
+                self.first_dialogs = self.phrases
+
+        if phrase_text == {}:
+            phrase_text = self.first_phrases
+            self.phrases = self.first_dialogs
+            phrase_text['goodbye'] = random_bye_phrase()
+
+        if phrase_id == '':
+            phrase_text['goodbye'] = random_bye_phrase()
+            self.first_phrases = phrase_text
+        self.phrase_text = phrase_text
 
 
 class DialogManager(JsonLoader):
@@ -63,11 +80,11 @@ class DialogManager(JsonLoader):
                 self._dialogs_dictionary[dialog_dict['interlocutor']] = [dialog_dict]
 
     def get_dialog_by_interlocutor(self, interlocutor: str) -> Dialog:
-        available_dialogs = []
+        dialog_obj = Dialog()
         for dialog in self._dialogs_dictionary[interlocutor]:
             if all_activators_true(dialog['activator']):
-                available_dialogs.append(dialog)
-        dialog = Dialog()
-        dialog.available_dialogs = available_dialogs
-        self._active_dialog = dialog
-        return dialog
+                dialog_obj.phrases += dialog['phrases']
+        dialog_obj.interlocutor = interlocutor
+        dialog_obj.first_phrases = dialog_obj.phrases
+        self._active_dialog = dialog_obj
+        return dialog_obj

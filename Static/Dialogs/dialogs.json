@@ -5,26 +5,26 @@
     "activator": [],
     "phrases": [
       {
-        "id": "0",
+        "id": "main_storyline0",
         "variables_to_set": {
-          "some_variable": false
+          "temp_quest_start_condition1": true
         },
-        "activator": [],
-        "phrase_text": "Hello",
+        "activator": ["temp_quest_start_condition"],
+        "phrase_text": "Hello Andrey",
         "answer_text": "What brings you here?",
         "phrases": [
           {
-            "id": "0_1",
+            "id": "main_storyline0_1",
             "variables_to_set": {
               "some_variable": false,
               "have_item": true
             },
             "activator": [],
-            "phrase_text": "Tell me smt",
-            "answer_text": "Tell me a lot",
+            "phrase_text": "Want to buy smth",
+            "answer_text": "Tell me a lot1",
             "phrases": [
               {
-                "id": "0_1_1",
+                "id": "main_storyline0_1_1",
                 "variables_to_set": {},
                 "activator": [],
                 "phrase_text": "Tell me smt1",
@@ -32,7 +32,7 @@
                 "phrases": []
               },
               {
-                "id": "0_1_2",
+                "id": "main_storyline0_1_2",
                 "variables_to_set": {},
                 "activator": [],
                 "phrase_text": "Tell me smt2",
@@ -40,7 +40,7 @@
                 "phrases": []
               },
               {
-                "id": "0_1_3",
+                "id": "main_storyline0_1_3",
                 "variables_to_set": {},
                 "activator": [],
                 "phrase_text": "Tell me smt3",
@@ -50,27 +50,27 @@
             ]
           },
           {
-            "id": "0_2",
+            "id": "main_storyline0_2",
             "variables_to_set": {},
             "activator": [],
-            "phrase_text": "main_storyline hello2",
+            "phrase_text": "I want to see you",
             "answer_text": "main_storyline hello answer2",
             "phrases": []
           }
         ]
       },
       {
-        "id": "1",
+        "id": "main_storyline1",
         "variables_to_set": {
           "some_variable": true,
           "have_item": true
         },
         "activator": [],
-        "phrase_text": "Hello1",
-        "answer_text": "What brings you here?1",
+        "phrase_text": "Pryvet",
+        "answer_text": "What?",
         "phrases": [
           {
-            "id": "1_1",
+            "id": "main_storyline1_1",
             "variables_to_set": {},
             "activator": [],
             "phrase_text": "Tell me smt1",
@@ -78,7 +78,7 @@
             "phrases": []
           },
           {
-            "id": "1_2",
+            "id": "main_storyline1_2",
             "variables_to_set": {},
             "activator": [],
             "phrase_text": "main_storyline hello1",
@@ -95,7 +95,7 @@
     "activator": [],
     "phrases": [
       {
-        "id": "0",
+        "id": "not_main_dialog0",
         "variables_to_set": {
           "some_variable": false
         },
@@ -104,7 +104,7 @@
         "answer_text": "What brings you here?1",
         "phrases": [
           {
-            "id": "0_1",
+            "id": "not_main_dialog0_1",
             "variables_to_set": {
               "some_variable": false,
               "have_item": true
@@ -114,7 +114,7 @@
             "answer_text": "Tell me a lot1",
             "phrases": [
               {
-                "id": "0_1_1",
+                "id": "not_main_dialog0_1_1",
                 "variables_to_set": {},
                 "activator": [],
                 "phrase_text": "Tell me smt11",
@@ -122,17 +122,17 @@
                 "phrases": []
               },
               {
-                "id": "0_1_2",
+                "id": "not_main_dialog0_1_2",
                 "variables_to_set": {},
-                "activator": [false],
+                "activator": [],
                 "phrase_text": "Tell me smt21",
                 "answer_text": "Tell me a lot21",
                 "phrases": []
               },
               {
-                "id": "0_1_3",
+                "id": "not_main_dialog0_1_3",
                 "variables_to_set": {},
-                "activator": [false],
+                "activator": [],
                 "phrase_text": "Tell me smt31",
                 "answer_text": "Tell me a lot31",
                 "phrases": []
@@ -140,7 +140,7 @@
             ]
           },
           {
-            "id": "0_2",
+            "id": "not_main_dialog0_2",
             "variables_to_set": {},
             "activator": [],
             "phrase_text": "main_storyline hello21",
@@ -150,7 +150,7 @@
         ]
       },
       {
-        "id": "1",
+        "id": "not_main_dialog1",
         "variables_to_set": {
           "some_variable": true,
           "have_item": true
@@ -160,7 +160,7 @@
         "answer_text": "What brings you here?1",
         "phrases": [
           {
-            "id": "1_1",
+            "id": "not_main_dialog1_1",
             "variables_to_set": {},
             "activator": [],
             "phrase_text": "Tell me smt1",
@@ -168,7 +168,7 @@
             "phrases": []
           },
           {
-            "id": "1_2",
+            "id": "not_main_dialog1_2",
             "variables_to_set": {},
             "activator": [],
             "phrase_text": "main_storyline hello1",
@@ -194,24 +194,24 @@
     ],
     "phrases": [
       {
-        "id": "1_1",
+        "id": "not_main_dialog21_1",
         "variables_to_set": {},
         "activator": [],
-        "phrase_text": "Tell me smt1",
-        "answer_text": "Tell me a lot1",
+        "phrase_text": "How you doing?",
+        "answer_text": "Great thanks",
         "phrases": []
       },
       {
-        "id": "1_2",
+        "id": "not_main_dialog21_2",
         "variables_to_set": {},
         "activator": [
 
         ],
-        "phrase_text": "main_storyline hello1",
-        "answer_text": "main_storyline hello answer1",
+        "phrase_text": "Whats goin on here",
+        "answer_text": "Nothing",
         "phrases": [
           {
-            "id": "0_2",
+            "id": "not_main_dialog20_2",
             "variables_to_set": {},
             "activator": [],
             "phrase_text": "main_storyline hello21",

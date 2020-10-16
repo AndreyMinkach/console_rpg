@@ -30,8 +30,6 @@ class UIText(UIBase):
         self._text_layout.content_valign = 'center'
         self.position = position
         self.color = tint_color
-        self._set_background_color(hover_color)
-        self._set_background_color(self._background_color)
 
     def set_text(self, text: str):
         self.my_label.text = text
@@ -82,6 +80,3 @@ class UIText(UIBase):
         self._text_layout.begin_update()
         self._text_layout._init_groups(OrderedGroup(group.order + 1))
         self._text_layout.end_update()
-
-    def update_logic(self, **kwargs):
-        super().update_logic()

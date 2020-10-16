@@ -30,9 +30,11 @@ if __name__ == '__main__':
                       vsync=True)
     hit_test = HitTest(window)
     input_helper = InputHelper(window)
-
+    quest_manager.start_quest('my_temp_quest')
+    quest_manager.set_quest_variable('temp_quest_start_condition', True)
     UIDialog(Vector2.zero, Vector2(500, 200), 'Name')
-    q = UIText('asd', Vector2.zero, Vector2(100, 200))
+
+    # q = UIText('asd', Vector2.zero, Vector2(100, 200))
 
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                           scale=1.0)
