@@ -26,10 +26,10 @@ class Inventory:
         else:
             return -1
 
-    def get_item_list_by_type(self, item_type: type):
+    def get_item_list_by_type(self, item_type: str):
         result_list = []
-        for item in self._item_dict:
-            if isinstance(item, item_type):
+        for key_id, item in self._item_dict.items():
+            if item.item_type == item_type:
                 result_list.append(item)
         return result_list
 

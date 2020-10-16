@@ -1,5 +1,3 @@
-import time
-
 from Helpers.location_helper import Vector2
 
 
@@ -8,10 +6,10 @@ def _get_last_list_element(some_list):
 
 
 class InputHelper:
-    instance: 'InputHelper' = None
+    _instance: 'InputHelper' = None
 
     def __init__(self, window):
-        self.__class__.instance = self
+        self.__class__._instance = self
         self.window = window
         self._keys_pressed = []
         self._keys_down = []
@@ -29,7 +27,7 @@ class InputHelper:
         self._scroll_ticks = 0
 
         window.push_handlers(self.on_key_press, self.on_key_release, self.on_mouse_press, self.on_mouse_release,
-                             self.on_mouse_scroll, self.on_mouse_motion)
+                             self.on_mouse_scroll, self.on_mouse_motion, self.on_mouse_drag)
 
     def on_key_press(self, symbol, modifiers):
         self._keys_pressed.append(symbol)
@@ -61,56 +59,74 @@ class InputHelper:
         self._mouse_pos = Vector2(x, y)
         self._mouse_pos_delta = Vector2(dx, dy)
 
-    def get_mouse_scroll(self):
-        return self._mouse_scroll
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        self._mouse_pos = Vector2(x, y)
+        self._mouse_pos_delta = Vector2(dx, dy)
 
-    def is_key_pressed(self, key):
-        return key in self._keys_pressed
+    @classmethod
+    def get_mouse_scroll(cls) -> int:
+        return cls._instance._mouse_scroll
 
-    def is_key_down(self, key):
-        return key in self._keys_down
+    @classmethod
+    def is_key_pressed(cls, key) -> bool:
+        return key in cls._instance._keys_pressed
 
-    def is_key_up(self, key):
-        return key in self._keys_up
+    @classmethod
+    def is_key_down(cls, key) -> bool:
+        return key in cls._instance._keys_down
 
-    def is_mouse_pressed(self, button):
-        return button in self._mouse_pressed_buttons
+    @classmethod
+    def is_key_up(cls, key) -> bool:
+        return key in cls._instance._keys_up
 
-    def is_mouse_down(self, button):
-        return button in self._mouse_down_buttons
+    @classmethod
+    def is_mouse_pressed(cls, button) -> bool:
+        return button in cls._instance._mouse_pressed_buttons
 
-    def is_mouse_up(self, button):
-        return button in self._mouse_up_buttons
+    @classmethod
+    def is_mouse_down(cls, button) -> bool:
+        return button in cls._instance._mouse_down_buttons
 
-    def get_last_mouse_pressed_button(self):
-        return _get_last_list_element(self._mouse_pressed_buttons)
+    @classmethod
+    def is_mouse_up(cls, button) -> bool:
+        return button in cls._instance._mouse_up_buttons
 
-    def get_last_mouse_button_down(self):
-        return _get_last_list_element(self._mouse_down_buttons)
+    @classmethod
+    def get_last_mouse_pressed_button(cls):
+        return _get_last_list_element(cls._instance._mouse_pressed_buttons)
 
-    def get_last_mouse_button_up(self):
-        return _get_last_list_element(self._mouse_up_buttons)
+    @classmethod
+    def get_last_mouse_button_down(cls):
+        return _get_last_list_element(cls._instance._mouse_down_buttons)
 
-    def get_last_pressed_key(self):
-        return _get_last_list_element(self._keys_pressed)
+    @classmethod
+    def get_last_mouse_button_up(cls):
+        return _get_last_list_element(cls._instance._mouse_up_buttons)
 
-    def get_mouse_pos(self):
-        return self._mouse_pos
+    @classmethod
+    def get_last_pressed_key(cls):
+        return _get_last_list_element(cls._instance._keys_pressed)
 
-    def get_mouse_pos_delta(self):
-        return self._mouse_pos_delta
+    @classmethod
+    def get_mouse_pos(cls) -> Vector2:
+        return cls._instance._mouse_pos
 
-    def update(self):
+    @classmethod
+    def get_mouse_pos_delta(cls) -> Vector2:
+        return cls._instance._mouse_pos_delta
+
+    @classmethod
+    def update(cls):
         # if self._key_down_ticks != self.window.total_ticks:
-        self._keys_down.clear()
+        cls._instance._keys_down.clear()
         # if self._key_up_ticks != self.window.total_ticks:
-        self._keys_up.clear()
+        cls._instance._keys_up.clear()
 
         # if self._mouse_down_ticks != self.window.total_ticks:
-        self._mouse_down_buttons.clear()
+        cls._instance._mouse_down_buttons.clear()
         # if self._mouse_up_ticks != self.window.total_ticks:
-        self._mouse_up_buttons.clear()
-        if self._scroll_ticks != self.window.total_ticks:
-            self._mouse_scroll = 0.0
+        cls._instance._mouse_up_buttons.clear()
+        if cls._instance._scroll_ticks != cls._instance.window.total_ticks:
+            cls._instance._mouse_scroll = 0.0
 
-        self._mouse_pos_delta = Vector2.zero
+        cls._instance._mouse_pos_delta = Vector2.zero

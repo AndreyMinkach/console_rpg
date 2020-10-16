@@ -39,11 +39,12 @@ class Quest:
 
 
 class QuestManager(JsonLoader):
-    instance = None
-    quest_json_verify_pattern = {"id": str, "variables": list, "activator": str, "required_level": int, "stages": list}
+    instance: 'QuestManager' = None
+    quest_json_verify_pattern: dict = {"id": str, "variables": list, "activator": str, "required_level": int,
+                                       "stages": list}
 
     def __init__(self):
-        super().__init__('Static/Quests/')
+        super().__init__('Static/Quests/', verify_pattern=self.__class__.quest_json_verify_pattern)
         self.__class__.instance = self
         # this list contains active user quests, which the manager should update every frame
         self._active_quest_list = []
