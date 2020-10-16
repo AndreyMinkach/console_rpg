@@ -23,7 +23,6 @@ storyboard = Storyboard()
 quest_manager = QuestManager()
 location_manager = LocationManager()
 
-
 if __name__ == '__main__':
     window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=False,
                       vsync=True)

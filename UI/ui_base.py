@@ -14,19 +14,17 @@ from UI.renderer import Renderer
 
 
 class UIBase(Sprite):
-    def __init__(self, position: Vector2, size: Vector2, texture: AbstractImage = None, transparent=False,
+    def __init__(self, position: Vector2, size: Vector2, texture: AbstractImage = None,
                  image_fill_color=ColorHelper.WHITE,
-                 tint_color: (int, int, int) = ColorHelper.WHITE[:3]):
+                 tint_color: (int, int, int, int) = ColorHelper.WHITE):
         if texture is None:
-            texture = pyglet.image.SolidColorImagePattern(image_fill_color).create_image(1, 1)
+            texture = pyglet.image.SolidColorImagePattern(image_fill_color).create_image(size.x, size.y)
 
         super().__init__(Renderer.add_texture(texture), x=position.x, y=position.y,
                          batch=Renderer.get_main_batch(),
                          group=Renderer.get_main_group())
 
-        self.scale_x = size.x
-        self.scale_y = size.y
-        self.color = tint_color
+        self.color = tint_color if len(tint_color) == 3 else tint_color[:3]
         self._enabled = True
         self._current_batch = self.batch
         self.children: List[UIBase] = []
@@ -36,7 +34,7 @@ class UIBase(Sprite):
         self._size = size
         self.custom_data = None  # can contain some data to simplify data transfer between scripts
         self.parent = None
-        self.opacity = 255 if not transparent else 0
+        self.opacity = tint_color[3] if len(tint_color) >= 4 else 255
         self._opacity = 255
         self._is_mouse_inside = False
         self._hit_test_color = HitTest.instance.get_random_color(self)
