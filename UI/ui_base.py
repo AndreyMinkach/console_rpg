@@ -1,3 +1,4 @@
+import warnings
 from typing import List
 
 import pyglet
@@ -41,15 +42,53 @@ class ScissorGroup(OrderedGroup):
         glDisable(GL_SCISSOR_TEST)
 
 
+class UniformSetter:
+    def __init__(self, shader: ShaderProgram):
+        self.shader = shader
+        self._uniforms = {}
+        self._need_to_update = True
+        for i in self.shader.uniforms:
+            uniform_name = i[0]
+            uniform_value = self.shader.uniforms.__getattr__(uniform_name)
+            if uniform_value is not None and uniform_name != 'screen_size':
+                self._uniforms[uniform_name] = [uniform_value, type(uniform_value)]
+
+    def set_uniform(self, name: str, value):
+        if name in self._uniforms.keys():
+            uniform_list = self._uniforms[name]
+            if type(value) is uniform_list[1]:
+                uniform_list[0] = value
+                self._need_to_update = True
+            else:
+                warnings.warn(
+                    f"Wrong value type of '{name}' uniform: '{uniform_list[1]}' expected, '{type(value)}' got")
+        else:
+            warnings.warn(f"There is no uniform named '{name}' in the shader!!")
+
+    def set_uniforms(self, uniform_dict: dict):
+        for key, value in uniform_dict.items():
+            self.set_uniform(key, value)
+
+    def apply(self):
+        if self._need_to_update:
+            for key, value in self._uniforms.items():
+                self.shader.uniforms.__setattr__(key, value[0])
+            self._need_to_update = False
+
+
 class ShadedGroup(SpriteGroup):
-    def __init__(self, texture, blend_src, blend_dest, shader: ShaderProgram, parent=None):
+    def __init__(self, texture, shader: ShaderProgram, uniform_setter: UniformSetter, parent=None,
+                 blend_src: int = GL_SRC_ALPHA,
+                 blend_dest: int = GL_ONE_MINUS_SRC_ALPHA):
         super().__init__(texture, blend_src, blend_dest, parent)
         self.shader: ShaderProgram = shader
+        self.uniform_setter = uniform_setter
 
     def set_state(self):
         super().set_state()
         self.shader.use()
         self.shader.uniforms.screen_size = Renderer.get_window_size()
+        self.uniform_setter.apply()
 
     def unset_state(self):
         super().unset_state()
@@ -70,6 +109,7 @@ class UIBase(Sprite):
         self._size = Vector2(texture.width, texture.height)
         self._is_removing = False
         self.shader = shader
+        self.uniforms = UniformSetter(self.shader)
         self.color = tint_color if len(tint_color) == 3 else tint_color[:3]
         self._enabled = True
         self._current_batch = self.batch
@@ -146,7 +186,7 @@ class UIBase(Sprite):
             HitTest.update_batch(self)
 
     def _set_group(self, value: OrderedGroup):
-        self._group = ShadedGroup(self._texture, self._group.blend_src, self._group.blend_dest, self.shader, value)
+        self._group = ShadedGroup(self._texture, self.shader, self.uniforms, parent=value)
         if self._batch is not None:
             self._batch.migrate(self._vertex_list, GL_QUADS, self._group, self._batch)
 

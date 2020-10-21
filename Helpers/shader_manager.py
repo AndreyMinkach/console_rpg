@@ -1,4 +1,5 @@
 import pyshaders
+from pyglet.gl import glDeleteProgram
 from pyshaders import ShaderProgram
 
 default_vs = """
@@ -47,7 +48,7 @@ varying vec4 vertex_color;
 
 uniform sampler2D tex;
 
-uniform float outline_width = 0;
+uniform float outline_width = 2;
 uniform vec4 outline_color = vec4(1.0, 1.0, 1.0, 1.0);
 
 const vec2 offsets[8] = vec2[8](vec2(0, 1), vec2(0, -1), vec2(1, 0), vec2(-1, 0), vec2(-1, 1), vec2(-1, -1),
@@ -124,15 +125,16 @@ varying vec3 vertex_uv;
 varying vec4 vertex_color;
 
 uniform sampler2D tex;
-uniform vec2 uv_boundaries = vec2(0.29296875, 0.22412109375);
-uniform float vignette_intensity = 0.9;
-uniform float vignette_radius = 0.5;
-uniform float vignette_softness = 0.1;
+uniform vec2 texture_size = vec2(0);
+uniform float vignette_intensity = 0.0;
+uniform float vignette_radius = 0.0;
+uniform float vignette_softness = 0.0;
 
 const vec2 uv_center = vec2(0.5, 0.5);
 
 vec4 vignette(vec4 tex_color, vec2 coord)
 {
+    vec2 uv_boundaries = texture_size / textureSize(tex, 0);
     float norm_factor = length(uv_boundaries) * 0.5;
     float distance = length(coord - uv_center * uv_boundaries);
 
@@ -159,6 +161,19 @@ class ShaderManager:
         self.outline_shader: ShaderProgram = pyshaders.from_string(default_vs, outline_fs)
         self.blur_shader: ShaderProgram = pyshaders.from_string(default_vs, blur_fs)
         self.vignette_shader: ShaderProgram = pyshaders.from_string(default_vs, vignette_fs)
+
+    @classmethod
+    def _delete_shader(cls, shader: ShaderProgram):
+        if shader.owned and shader.valid():
+            shader.detach(*shader.shaders())
+            glDeleteProgram(shader.pid)
+
+    @classmethod
+    def close(cls):
+        cls._delete_shader(cls._instance.default_shader)
+        cls._delete_shader(cls._instance.outline_shader)
+        cls._delete_shader(cls._instance.blur_shader)
+        cls._delete_shader(cls._instance.vignette_shader)
 
     @classmethod
     def default_shader(cls):

@@ -2,6 +2,7 @@ from pyglet.gl import *
 
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
+from Helpers.shader_manager import ShaderManager
 from UI.renderer import Renderer
 
 
@@ -33,3 +34,7 @@ class MyWindow(pyglet.window.Window):
         self.total_ticks += 1
         if self.total_ticks > 1000:
             self.total_ticks -= 1000
+
+    def on_close(self):
+        ShaderManager.close()
+        self.close()
