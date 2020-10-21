@@ -1,4 +1,3 @@
-from pyglet.graphics import Batch, OrderedGroup
 from UI.ui_base import *
 
 
@@ -18,6 +17,10 @@ class UISprite(UIBase):
         self.sprite = pyglet.sprite.Sprite(sprite_animation, x=position.x, y=position.y, batch=self.batch,
                                            group=OrderedGroup(self.group.order + 1))
         self.sprite.update(scale=scale)
+
+    def delete(self):
+        super().delete()
+        self.sprite.delete()
 
     @UIBase.batch.setter
     def batch(self, value: Batch):

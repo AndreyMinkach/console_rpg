@@ -1,43 +1,87 @@
 from typing import List
 
 import pyglet
+from pyglet.gl import *
 from pyglet.graphics import Batch, OrderedGroup
 from pyglet.image import AbstractImage
-from pyglet.sprite import Sprite
+from pyglet.sprite import Sprite, SpriteGroup
+from pyshaders import ShaderProgram
 
 from Animation.number_field_animation import NumberFieldAnimation
 from Animation.storyboard import Storyboard
 from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.location_helper import Vector2
+from Helpers.shader_manager import ShaderManager
 from UI.renderer import Renderer
+
+
+class ScissorGroup(OrderedGroup):
+    def __init__(self, x, y, width, height, order, parent=None):
+        super().__init__(order=order, parent=parent)
+        self.x, self.y = x, y
+        self.width, self.height = width, height
+        self.order = order
+
+    @property
+    def area(self):
+        return self.x, self.y, self.width, self.height
+
+    @area.setter
+    def area(self, area):
+        self.x, self.y, self.width, self.height = area
+
+    def set_state(self):
+        super().set_state()
+        glEnable(GL_SCISSOR_TEST)
+        glScissor(int(self.x), int(self.y), int(self.width), int(self.height))
+
+    def unset_state(self):
+        super().unset_state()
+        glDisable(GL_SCISSOR_TEST)
+
+
+class ShadedGroup(SpriteGroup):
+    def __init__(self, texture, blend_src, blend_dest, shader: ShaderProgram, parent=None):
+        super().__init__(texture, blend_src, blend_dest, parent)
+        self.shader: ShaderProgram = shader
+
+    def set_state(self):
+        super().set_state()
+        self.shader.use()
+        self.shader.uniforms.screen_size = Renderer.get_window_size()
+
+    def unset_state(self):
+        super().unset_state()
+        self.shader.clear()
 
 
 class UIBase(Sprite):
     def __init__(self, position: Vector2, size: Vector2, texture: AbstractImage = None,
-                 image_fill_color=ColorHelper.WHITE,
-                 tint_color: (int, int, int, int) = ColorHelper.WHITE):
+                 image_fill_color=ColorHelper.WHITE, tint_color: (int, int, int, int) = ColorHelper.WHITE,
+                 shader: ShaderProgram = ShaderManager.default_shader()):
         if texture is None:
-            texture = pyglet.image.SolidColorImagePattern(image_fill_color).create_image(size.x, size.y)
+            texture = Renderer.add_texture(
+                pyglet.image.SolidColorImagePattern(image_fill_color).create_image(size.x, size.y))
 
-        super().__init__(Renderer.add_texture(texture), x=position.x, y=position.y,
-                         batch=Renderer.get_main_batch(),
-                         group=Renderer.get_main_group())
+        super().__init__(texture, x=position.x, y=position.y, batch=Renderer.get_main_batch())
 
+        self._position = position
+        self._size = Vector2(texture.width, texture.height)
+        self._is_removing = False
+        self.shader = shader
         self.color = tint_color if len(tint_color) == 3 else tint_color[:3]
         self._enabled = True
         self._current_batch = self.batch
         self.children: List[UIBase] = []
-        self.children_batch = Batch()
-        self.children_group = OrderedGroup(self.group.order + 1)
-        self._position = position
-        self._size = size
+        self._set_group(Renderer.get_main_group())
+        self.children_group = ScissorGroup(position.x, position.y, size.x, size.y, self.group.order + 1)
         self.custom_data = None  # can contain some data to simplify data transfer between scripts
-        self.parent = None
+        self.parent: UIBase = None
         self.opacity = tint_color[3] if len(tint_color) >= 4 else 255
         self._opacity = 255
-        self._is_mouse_inside = False
-        self._hit_test_color = HitTest.instance.get_random_color(self)
+        HitTest.add_ui_object(self)
+        self._set_size(size)
         Renderer.add_ui_object(self)
 
         # event handlers
@@ -45,6 +89,15 @@ class UIBase(Sprite):
         self.on_click_up = lambda *args: None
         self.on_mouse_enter = lambda *args: None
         self.on_mouse_leave = lambda *args: None
+
+    def delete(self):
+        # do not call this method on ScrollableContainer instance
+        self._is_removing = True
+        if self.parent is not None:
+            self.parent.remove_child(self)
+        Renderer.remove_ui_object(self)
+        HitTest.remove_ui_object(self)
+        super().delete()
 
     @property
     def position(self):
@@ -59,16 +112,23 @@ class UIBase(Sprite):
         for i in self.children:
             i.position = i.position + pos_difference
         self._position = value
+        self.children_group.area = self.position.x, self.position.y, self.size.x, self.size.y
+        HitTest.update_position(self)
 
     @property
     def size(self):
         return self._size
 
-    @size.setter
-    def size(self, value: Vector2):
+    def _set_size(self, value: Vector2):
         self.scale_x = value.x / float(self._size.x)
         self.scale_y = value.y / float(self._size.y)
         self._size = value
+        self.children_group.area = self.position.x, self.position.y, self.size.x, self.size.y
+        HitTest.update_size(self)
+
+    @size.setter
+    def size(self, value: Vector2):
+        self._set_size(value)
 
     def delete_children(self):
         for child in self.children:
@@ -82,26 +142,35 @@ class UIBase(Sprite):
         Sprite.batch.fset(self, value)
         self._current_batch = value
         self.set_enabled(self._enabled)
+        if not self._is_removing:
+            HitTest.update_batch(self)
+
+    def _set_group(self, value: OrderedGroup):
+        self._group = ShadedGroup(self._texture, self._group.blend_src, self._group.blend_dest, self.shader, value)
+        if self._batch is not None:
+            self._batch.migrate(self._vertex_list, GL_QUADS, self._group, self._batch)
 
     @Sprite.group.setter
     def group(self, value: OrderedGroup):
-        Sprite.group.fset(self, value)
-        self.children_group = OrderedGroup(value.order + 1)
+        self._set_group(value)
+        self.children_group = ScissorGroup(self.position.x, self.position.y, self.size.x, self.size.y,
+                                           (value.order if value is not None else 0) + 1)
         for i in self.children:
             i.group = self.children_group
+        if not self._is_removing:
+            HitTest.update_group(self)
 
     def set_enabled(self, enable: bool):
         self._enabled = enable
         Sprite.batch.fset(self, self._current_batch if enable else None)
         for i in self.children:
-            i.batch = self.children_batch if enable else None
+            i.batch = self.batch if enable else None
 
     def get_enabled(self) -> bool:
         return self._enabled
 
     def add_child(self, child: 'UIBase'):
         child.parent = self
-        child.batch = self.children_batch if child.get_enabled() else None
         child.group = self.children_group
         self.children.append(child)
 
@@ -110,7 +179,6 @@ class UIBase(Sprite):
 
     def _remove_child(self, child: 'UIBase', only_detach: bool = False):
         child.parent = None
-        child.batch = Renderer.get_main_batch()
         child.group = Renderer.get_main_group()
         if not only_detach:
             self.children.remove(child)

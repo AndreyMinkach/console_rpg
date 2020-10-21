@@ -4,7 +4,7 @@ from pyglet.text.layout import TextLayout
 
 from Helpers.color_helper import ColorHelper
 from Helpers.location_helper import Vector2
-from UI.ui_base import UIBase
+from UI.ui_base import UIBase, ScissorGroup
 
 
 class UIButton(UIBase):
@@ -19,7 +19,7 @@ class UIButton(UIBase):
         self._caption = caption
         self._document = FormattedDocument(caption)
         self.update_document_style(document_style)
-        self._text_layout = TextLayout(self._document, width=size.x, batch=self.batch, height=size.y, wrap_lines=True,
+        self._text_layout = TextLayout(self._document, width=size.x, height=size.y, batch=self.batch, wrap_lines=True,
                                        multiline=True)
         self._update_text_layout_groups(self.group)
         self._text_layout.content_valign = 'center'
@@ -29,6 +29,10 @@ class UIButton(UIBase):
 
         self.on_mouse_enter = lambda o: self._set_background_color(hover_color)
         self.on_mouse_leave = lambda o: self._set_background_color(self._background_color)
+
+    def delete(self):
+        self._text_layout.batch = None
+        super().delete()
 
     @property
     def caption(self) -> str:
@@ -46,7 +50,11 @@ class UIButton(UIBase):
 
     def _update_text_layout_groups(self, group: OrderedGroup):
         self._text_layout.begin_update()
-        self._text_layout._init_groups(OrderedGroup(group.order + 1))
+        if isinstance(group, ScissorGroup):
+            self._text_layout._init_groups(
+                ScissorGroup(x=group.x, y=group.y, width=group.width, height=group.height, order=(group.order + 1)))
+        else:
+            self._text_layout._init_groups(OrderedGroup(group.order + 1))
         self._text_layout.end_update()
 
     @UIBase.group.setter

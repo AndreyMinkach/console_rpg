@@ -2,6 +2,7 @@ from pyglet import font
 from pyglet.font.ttf import TruetypeInfo
 from pyglet.text.document import FormattedDocument
 from pyglet.text.layout import TextLayout
+
 from UI.ui_base import *
 
 
@@ -25,11 +26,16 @@ class UIText(UIBase):
         self._caption = caption
         self._document = FormattedDocument(caption)
         self.update_document_style(document_style)
-        self._text_layout = TextLayout(self._document, width=size.x, height=size.y, batch=self.batch,
-                                       group=OrderedGroup(self.group.order + 1.1), wrap_lines=True, multiline=True)
+        self._text_layout = TextLayout(self._document, width=size.x, height=size.y, batch=self.batch, wrap_lines=True,
+                                       multiline=True)
+        self._update_text_layout_groups(self.group)
         self._text_layout.content_valign = 'center'
         self.position = position
         self.color = tint_color
+
+    def delete(self):
+        self._text_layout.batch = None
+        super().delete()
 
     def set_text(self, text: str):
         self.my_label.text = text
@@ -78,5 +84,9 @@ class UIText(UIBase):
 
     def _update_text_layout_groups(self, group: OrderedGroup):
         self._text_layout.begin_update()
-        self._text_layout._init_groups(OrderedGroup(group.order + 1))
+        if isinstance(group, ScissorGroup):
+            self._text_layout._init_groups(
+                ScissorGroup(x=group.x, y=group.y, width=group.width, height=group.height, order=(group.order + 1)))
+        else:
+            self._text_layout._init_groups(OrderedGroup(group.order + 1))
         self._text_layout.end_update()

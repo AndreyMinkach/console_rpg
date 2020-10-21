@@ -7,28 +7,14 @@ from UI.ui_base import UIBase
 
 
 class ScrollableContainer(UIBase):
-    def __init__(self, position: Vector2, size: Vector2, offset_value=30):
+    def __init__(self, position: Vector2, size: Vector2, scroll_value=30, children_margin: Vector2 = Vector2.zero):
         super().__init__(position, size)
-        Renderer.remove_ui_object(self)
-        Renderer.add_ui_object_scissor(self)
 
-        self.children_margin = Vector2.zero
+        self.children_margin = children_margin
         self._should_update_children_positions = False
         self._viewer_extent = Vector2.zero  # the total area occupied by all child elements
         self._vertical_offset = 0
-        self._offset_value = offset_value
-        self._was_scissor_enabled = False
-
-    def _enable_scissor_test(self):
-        gl.glPushAttrib(gl.GL_ENABLE_BIT | gl.GL_TRANSFORM_BIT | gl.GL_CURRENT_BIT)
-        self._was_scissor_enabled = gl.glIsEnabled(gl.GL_SCISSOR_TEST)
-        gl.glEnable(gl.GL_SCISSOR_TEST)
-        gl.glScissor(int(self.x), int(self.y), int(self.width), int(self.height))
-
-    def _disable_scissor_test(self):
-        if not self._was_scissor_enabled:
-            gl.glDisable(gl.GL_SCISSOR_TEST)
-        gl.glPopAttrib()
+        self._scroll_value = scroll_value
 
     def add_child(self, child: 'UIBase'):
         child.set_enabled(self.get_enabled() & child.get_enabled())
@@ -72,7 +58,6 @@ class ScrollableContainer(UIBase):
         self._vertical_offset = self.size.y - self._viewer_extent.y - self.children_margin.y
 
     def update_logic(self, **kwargs):
-        self._enable_scissor_test()
         if self.get_enabled():
             super().update_logic()
             scroll_changed = self._update_scroll()
@@ -89,16 +74,12 @@ class ScrollableContainer(UIBase):
                         viewer_height += child.size.y
                 self._should_update_children_positions = False
 
-            self.children_batch.draw()
-
-        self._disable_scissor_test()
-
     def _update_scroll(self) -> bool:
         mouse_pos = InputHelper.get_mouse_pos()
         is_cursor_inside = self.is_point_inside(mouse_pos)
         current_scroll = InputHelper.get_mouse_scroll()
         if is_cursor_inside:
-            self._vertical_offset += -current_scroll * self._offset_value
+            self._vertical_offset += -current_scroll * self._scroll_value
             self._vertical_offset = max(self.size.y - self._viewer_extent.y - self.children_margin.y,
                                         min(self._vertical_offset, 0))
         return current_scroll != 0

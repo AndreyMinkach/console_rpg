@@ -1,3 +1,5 @@
+import pyglet
+from pyglet.gl import *
 from pyglet.graphics import Batch, OrderedGroup
 from pyglet.image import AbstractImage, TextureRegion
 from pyglet.image.atlas import TextureBin
@@ -11,11 +13,19 @@ class Renderer:
 
     def __init__(self):
         self.__class__._instance = self
+        self._window_size: (int, int) = (0, 0)
         self._main_batch = Batch()
         self._main_group = OrderedGroup(0)
         self._texture_atlas = TextureBin()
         self._ui_object_list = []
-        self._ui_that_use_scissor_list = []  # stores ui objects that use scissor buffer and must be updated in draw method
+
+    @classmethod
+    def get_window_size(cls) -> (int, int):
+        return cls._instance._window_size
+
+    @classmethod
+    def set_window_size(cls, value: (int, int)):
+        cls._instance._window_size = value
 
     @classmethod
     def get_main_batch(cls) -> Batch:
@@ -27,13 +37,20 @@ class Renderer:
 
     @classmethod
     def add_texture(cls, texture: AbstractImage, border: int = 0) -> TextureRegion:
-        return cls._instance._texture_atlas.add(texture, border)
+        texture_region = cls._instance._texture_atlas.add(texture, border)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        return texture_region
+
+    @classmethod
+    def load_image(cls, image_path: str, folder: str = 'Static/Images/', border=0):
+        return cls.add_texture(pyglet.image.load(folder + image_path), border)
 
     @classmethod
     def draw(cls):
-        HitTest.instance.draw()
+        HitTest.draw()
+        cls._instance._main_batch.invalidate()
         cls._instance._main_batch.draw()
-        [i.update_logic() for i in cls._instance._ui_that_use_scissor_list if i is not None]
 
     @classmethod
     def add_ui_object(cls, ui_object: Sprite):
@@ -44,14 +61,6 @@ class Renderer:
         cls._instance._ui_object_list.remove(ui_object)
 
     @classmethod
-    def add_ui_object_scissor(cls, ui_object: Sprite):
-        cls._instance._ui_that_use_scissor_list.append(ui_object)
-
-    @classmethod
-    def remove_ui_object_scissor(cls, ui_object: Sprite):
-        cls._instance._ui_that_use_scissor_list.remove(ui_object)
-
-    @classmethod
     def update_logic(cls):
-        HitTest.instance.update()
+        HitTest.update()
         [i.update_logic() for i in cls._instance._ui_object_list if i is not None]
