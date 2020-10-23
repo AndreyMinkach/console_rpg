@@ -8,6 +8,7 @@ from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
+from Helpers.shader_manager import ShaderManager
 from UI.renderer import Renderer
 from UI.ui_base import UIBase
 from UI.ui_button import UIButton
