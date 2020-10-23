@@ -4,7 +4,10 @@ from pyshaders import ShaderProgram
 
 default_vs = """
 #version 330 core
-layout(location = 0)in vec2 vertex;
+
+layout(location = 0)in vec2 vertices;
+layout(location = 1)in vec4 colors;
+layout(location = 2)in vec3 tex_coords;
 
 varying vec2 vertex_pos;
 varying vec3 vertex_uv;
@@ -19,10 +22,10 @@ vec2 to_clip_space(vec2 pos)
 
 void main()
 {
-    vertex_pos = to_clip_space(vertex);
+    vertex_pos = to_clip_space(vertices);
     gl_Position = vec4(vertex_pos, 0.0, 1.0);
-    vertex_uv = gl_MultiTexCoord0;
-    vertex_color = gl_Color;
+    vertex_uv = tex_coords;
+    vertex_color = colors / 255,0;
 }
 """
 default_fs = """
@@ -48,7 +51,7 @@ varying vec4 vertex_color;
 
 uniform sampler2D tex;
 
-uniform float outline_width = 2;
+uniform float outline_width = 0;
 uniform vec4 outline_color = vec4(1.0, 1.0, 1.0, 1.0);
 
 const vec2 offsets[8] = vec2[8](vec2(0, 1), vec2(0, -1), vec2(1, 0), vec2(-1, 0), vec2(-1, 1), vec2(-1, -1),
@@ -128,7 +131,7 @@ uniform sampler2D tex;
 uniform vec2 texture_size = vec2(0);
 uniform float vignette_intensity = 0.0;
 uniform float vignette_radius = 0.0;
-uniform float vignette_softness = 0.0;
+uniform float vignette_softness = 0.1;
 
 const vec2 uv_center = vec2(0.5, 0.5);
 
