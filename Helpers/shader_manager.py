@@ -10,7 +10,7 @@ layout(location = 1)in vec4 colors;
 layout(location = 2)in vec3 tex_coords;
 
 varying vec2 vertex_pos;
-varying vec3 vertex_uv;
+varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
 uniform vec2 screen_size;
@@ -24,7 +24,7 @@ void main()
 {
     vertex_pos = to_clip_space(vertices);
     gl_Position = vec4(vertex_pos, 0.0, 1.0);
-    vertex_uv = tex_coords;
+    vertex_uv = tex_coords.xy;
     vertex_color = colors / 255,0;
 }
 """
@@ -34,19 +34,19 @@ default_fs = """
 uniform sampler2D tex;
 
 varying vec2 vertex_pos;
-varying vec3 vertex_uv;
+varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
 void main(void) 
 {
-    gl_FragColor = texture2D(tex, vertex_uv.xy) * vertex_color;
+    gl_FragColor = texture2D(tex, vertex_uv) * vertex_color;
 }
 """
 outline_fs = """
 #version 330 core
 
 varying vec2 vertex_pos;
-varying vec3 vertex_uv;
+varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
 uniform sampler2D tex;
@@ -88,7 +88,7 @@ blur_fs = """
 #version 330 core
 
 varying vec2 vertex_pos;
-varying vec3 vertex_uv;
+varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
 uniform sampler2D tex;
@@ -124,7 +124,7 @@ vignette_fs = """
 #version 330 core
 
 varying vec2 vertex_pos;
-varying vec3 vertex_uv;
+varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
 uniform sampler2D tex;
