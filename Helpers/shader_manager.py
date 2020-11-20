@@ -79,9 +79,11 @@ vec4 outline(sampler2D tex_sampler, vec2 uvs)
     return tex_color;
 }
 
+out vec4 output_color;
+
 void main(void) 
 {    
-    gl_FragColor = outline(tex, vertex_uv);
+    output_color = outline(tex, vertex_uv.xy);
 }
 """
 blur_fs = """
