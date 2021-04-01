@@ -2,7 +2,7 @@ import pyshaders
 from pyglet.gl import glDeleteProgram
 from pyshaders import ShaderProgram
 
-default_vs = """
+default_ui_vs = """
 #version 330 core
 
 layout(location = 0)in vec2 vertices;
@@ -28,7 +28,7 @@ void main()
     vertex_color = colors / 255,0;
 }
 """
-default_fs = """
+default_ui_fs = """
 #version 330 core
 
 uniform sampler2D tex;
@@ -42,7 +42,7 @@ void main(void)
     gl_FragColor = texture2D(tex, vertex_uv) * vertex_color;
 }
 """
-outline_fs = """
+outline_ui_fs = """
 #version 330 core
 
 varying vec2 vertex_pos;
@@ -84,7 +84,7 @@ void main(void)
     gl_FragColor = outline(tex, vertex_uv);
 }
 """
-blur_fs = """
+blur_ui_fs = """
 #version 330 core
 
 varying vec2 vertex_pos;
@@ -120,7 +120,7 @@ void main(void)
     gl_FragColor = blur(tex, vertex_uv) * vertex_color;
 }
 """
-vignette_fs = """
+vignette_ui_fs = """
 #version 330 core
 
 varying vec2 vertex_pos;
@@ -160,10 +160,10 @@ class ShaderManager:
 
     def __init__(self):
         self.__class__._instance = self
-        self.default_shader: ShaderProgram = pyshaders.from_string(default_vs, default_fs)
-        self.outline_shader: ShaderProgram = pyshaders.from_string(default_vs, outline_fs)
-        self.blur_shader: ShaderProgram = pyshaders.from_string(default_vs, blur_fs)
-        self.vignette_shader: ShaderProgram = pyshaders.from_string(default_vs, vignette_fs)
+        self.default_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, default_ui_fs)
+        self.outline_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, outline_ui_fs)
+        self.blur_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, blur_ui_fs)
+        self.vignette_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, vignette_ui_fs)
 
     @classmethod
     def _delete_shader(cls, shader: ShaderProgram):
@@ -173,26 +173,26 @@ class ShaderManager:
 
     @classmethod
     def close(cls):
-        cls._delete_shader(cls._instance.default_shader)
-        cls._delete_shader(cls._instance.outline_shader)
-        cls._delete_shader(cls._instance.blur_shader)
-        cls._delete_shader(cls._instance.vignette_shader)
+        cls._delete_shader(cls._instance.default_ui_shader)
+        cls._delete_shader(cls._instance.outline_ui_shader)
+        cls._delete_shader(cls._instance.blur_ui_shader)
+        cls._delete_shader(cls._instance.vignette_ui_shader)
 
     @classmethod
-    def default_shader(cls):
-        return cls._instance.default_shader
+    def default_ui_shader(cls):
+        return cls._instance.default_ui_shader
 
     @classmethod
-    def outline_shader(cls):
-        return cls._instance.outline_shader
+    def outline_ui_shader(cls):
+        return cls._instance.outline_ui_shader
 
     @classmethod
-    def blur_shader(cls):
-        return cls._instance.blur_shader
+    def blur_ui_shader(cls):
+        return cls._instance.blur_ui_shader
 
     @classmethod
-    def vignette_shader(cls):
-        return cls._instance.vignette_shader
+    def vignette_ui_shader(cls):
+        return cls._instance.vignette_ui_shader
 
 
 shader_manager = ShaderManager()

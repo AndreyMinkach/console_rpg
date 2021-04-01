@@ -98,7 +98,7 @@ class ShadedGroup(SpriteGroup):
 class UIBase(Sprite):
     def __init__(self, position: Vector2, size: Vector2, texture: AbstractImage = None,
                  image_fill_color=ColorHelper.WHITE, tint_color: (int, int, int, int) = ColorHelper.WHITE,
-                 shader: ShaderProgram = ShaderManager.default_shader()):
+                 shader: ShaderProgram = ShaderManager.default_ui_shader()):
         if texture is None:
             texture = Renderer.add_texture(
                 pyglet.image.SolidColorImagePattern(image_fill_color).create_image(size.x, size.y))
