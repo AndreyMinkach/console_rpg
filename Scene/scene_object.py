@@ -229,26 +229,6 @@ class SceneObject:
         glDeleteBuffers(1, [self.ebo_id])
         Renderer.remove_scene_object_to_render_loop(self)
 
-    @staticmethod
-    def read_texture(filename: str):
-        img = Image.open(filename)
-        img_data = np.array(list(img.getdata()), dtype=np.int8)
-
-        texture_id = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, texture_id)
-        # glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
-
-        pixel_format = GL_RGB if img.mode == "RGB" else GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, pixel_format, GL_UNSIGNED_BYTE, img_data)
-        return texture_id
-
     def draw(self) -> None:
         self.shader.use()
 
