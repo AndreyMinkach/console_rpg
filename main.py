@@ -11,6 +11,7 @@ from Helpers.location_helper import Vector2
 from Helpers.shader_manager import ShaderManager
 from Scene.camera import Camera
 from Scene.renderer import Renderer
+from Scene.scene_object import SceneObject
 from UI.ui_renderer import UIRenderer
 from UI.ui_base import UIBase
 from UI.ui_button import UIButton

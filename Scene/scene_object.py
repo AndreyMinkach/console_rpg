@@ -8,6 +8,7 @@ from typing import Any
 from OpenGL.GL import *
 
 from Scene.camera import Camera
+from Scene.renderer import Renderer
 from UI.ui_renderer import UIRenderer
 
 VS = '''
@@ -145,6 +146,8 @@ class SceneObject:
 
         self.test_angle = 0
 
+        Renderer.add_scene_object_to_render_loop(self)
+
     @staticmethod
     def _get_texture_uv(texture_region: TextureRegion) -> list:
         """
@@ -224,6 +227,7 @@ class SceneObject:
 
     def __del__(self) -> None:
         glDeleteBuffers(1, [self.ebo_id])
+        Renderer.remove_scene_object_to_render_loop(self)
 
     @staticmethod
     def read_texture(filename: str):
