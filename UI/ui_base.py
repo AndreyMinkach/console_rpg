@@ -14,7 +14,7 @@ from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.location_helper import Vector2
 from Helpers.shader_manager import ShaderManager
-from UI.renderer import Renderer
+from UI.ui_renderer import UIRenderer
 
 
 class ScissorGroup(OrderedGroup):
@@ -87,7 +87,7 @@ class ShadedGroup(SpriteGroup):
     def set_state(self):
         super().set_state()
         self.shader.use()
-        self.shader.uniforms.screen_size = Renderer.get_window_size()
+        self.shader.uniforms.screen_size = UIRenderer.get_window_size()
         self.uniform_setter.apply()
 
     def unset_state(self):
@@ -100,10 +100,10 @@ class UIBase(Sprite):
                  image_fill_color=ColorHelper.WHITE, tint_color: (int, int, int, int) = ColorHelper.WHITE,
                  shader: ShaderProgram = ShaderManager.default_ui_shader()):
         if texture is None:
-            texture = Renderer.add_texture(
+            texture = UIRenderer.add_texture(
                 pyglet.image.SolidColorImagePattern(image_fill_color).create_image(size.x, size.y))
 
-        super().__init__(texture, x=position.x, y=position.y, batch=Renderer.get_main_batch())
+        super().__init__(texture, x=position.x, y=position.y, batch=UIRenderer.get_main_batch())
 
         self._position = position
         self._size = Vector2(texture.width, texture.height)
@@ -114,7 +114,7 @@ class UIBase(Sprite):
         self._enabled = True
         self._current_batch = self.batch
         self.children: List[UIBase] = []
-        self._set_group(Renderer.get_main_group())
+        self._set_group(UIRenderer.get_main_group())
         self.children_group = ScissorGroup(position.x, position.y, size.x, size.y, self.group.order + 1)
         self.custom_data = None  # can contain some data to simplify data transfer between scripts
         self.parent: UIBase = None
@@ -122,7 +122,7 @@ class UIBase(Sprite):
         self._opacity = 255
         HitTest.add_ui_object(self)
         self._set_size(size)
-        Renderer.add_ui_object(self)
+        UIRenderer.add_ui_object(self)
 
         # event handlers
         self.on_click_down = lambda *args: None
@@ -135,7 +135,7 @@ class UIBase(Sprite):
         self._is_removing = True
         if self.parent is not None:
             self.parent.remove_child(self)
-        Renderer.remove_ui_object(self)
+        UIRenderer.remove_ui_object(self)
         HitTest.remove_ui_object(self)
         super().delete()
 
@@ -219,7 +219,7 @@ class UIBase(Sprite):
 
     def _remove_child(self, child: 'UIBase', only_detach: bool = False):
         child.parent = None
-        child.group = Renderer.get_main_group()
+        child.group = UIRenderer.get_main_group()
         if not only_detach:
             self.children.remove(child)
 

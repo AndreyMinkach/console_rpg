@@ -1,5 +1,9 @@
 class Vector2:
-    zero, one = None, None
+    """
+    This class is used only for ui objects to represent the size or coordinates in screen space
+    """
+    zero: 'Vector2' = None
+    one: 'Vector2' = None
 
     def __init__(self, x: int, y: int):
         self.x = x

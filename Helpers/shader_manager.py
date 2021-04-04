@@ -25,7 +25,7 @@ void main()
     vertex_pos = to_clip_space(vertices);
     gl_Position = vec4(vertex_pos, 0.0, 1.0);
     vertex_uv = tex_coords.xy;
-    vertex_color = colors / 255,0;
+    vertex_color = colors / 255.0;
 }
 """
 default_ui_fs = """
