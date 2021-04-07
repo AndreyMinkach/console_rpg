@@ -48,6 +48,7 @@ class UIRenderer:
 
     @classmethod
     def draw(cls):
+        # TODO: Rewrite HitTest
         # HitTest.draw()
         cls._instance._main_batch.invalidate()
         cls._instance._main_batch.draw()

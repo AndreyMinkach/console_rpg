@@ -1,7 +1,7 @@
 from math import radians
 import numpy as np
-from PIL import Image
-from pyglet.image import TextureRegion
+import pyglet.clock as clock
+from pyglet.image import TextureRegion, Animation
 from pyrr import Matrix44
 
 from typing import Any
@@ -9,7 +9,6 @@ from OpenGL.GL import *
 
 from Scene.camera import Camera
 from Scene.renderer import Renderer
-from UI.ui_renderer import UIRenderer
 
 VS = '''
 #version 330 core
@@ -121,23 +120,33 @@ class VertexAttrib:
 
 
 class SceneObject:
-    def __init__(self, sprite_path: str) -> None:
+    def __init__(self, image) -> None:
         self._anchor: tuple = (0.0, 0.0)
         self._position: list = [0] * 3
         self._rotation: float = 0.0
         self._scale: list = [1.0] * 3
 
-        self.texture: TextureRegion = UIRenderer.load_image(sprite_path)
+        # animation data
+        self._is_animation_playing: bool = False
+        self._frame_index: int = 0
+
+        if isinstance(image, Animation):
+            self._animation = image
+            self.texture: TextureRegion = image.frames[0].image.get_texture()
+        else:
+            self.texture: TextureRegion = image
+
         self.texture_coords: list = self._get_texture_uv(self.texture)
 
         self.shader = Shader(VS, FS)
+        # OpenGL data
         self.vertices = VertexAttrib(0, 2, np.array([-0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5], dtype=np.float32))
         self.colors = VertexAttrib(1, 4, np.array([1.0, 1.0, 1.0, 1.0] * 4, dtype=np.float32))
         self.uvs = VertexAttrib(2, 2, np.array(self.texture_coords, dtype=np.float32))
-
-        self.ebo_id = glGenBuffers(1)
         self.indices = np.array([0, 1, 2, 2, 3, 0], dtype=np.int32)
+        self.ebo_id = glGenBuffers(1)
 
+        # matrices
         self._translation_matrix: Matrix44 = Matrix44.from_translation(self._position)
         self._rotation_matrix: Matrix44 = Matrix44.from_z_rotation(self._rotation)
         self._scale_matrix: Matrix44 = Matrix44.from_scale(self._scale)
@@ -148,6 +157,35 @@ class SceneObject:
 
         Renderer.add_scene_object_to_render_loop(self)
 
+    def _animate(self, dt=0):
+        if not self._is_animation_playing:
+            return
+        if self._frame_index >= len(self._animation.frames):
+            self._frame_index = 0
+
+        frame = self._animation.frames[self._frame_index]
+        self.texture = frame.image.get_texture()
+        self.texture_coords: list = self._get_texture_uv(self.texture)
+        self.uvs.data = np.array(self.texture_coords, dtype=np.float32)
+        clock.schedule_once(self._animate, frame.duration)
+        self._frame_index += 1
+
+    def play_animation(self):
+        """
+        Starts animation playing
+        """
+        self._is_animation_playing = True
+        self._frame_index = 0
+
+        self._animate()
+
+    def stop_animation(self):
+        """
+        Stops animation playing
+        :return:
+        """
+        self._is_animation_playing = False
+
     @staticmethod
     def _get_texture_uv(texture_region: TextureRegion) -> list:
         """
@@ -156,21 +194,31 @@ class SceneObject:
         :param texture_region: InputTexture
         :return: UV coordinate list
         """
-        if texture_region.owner is not None:
-            uvs = list(texture_region.tex_coords)
-            del uvs[3 - 1::3]  # remove every third(z-component) element
-            uvs[2], uvs[6] = uvs[6], uvs[2]
-            uvs[3], uvs[7] = uvs[7], uvs[3]
+        if texture_region is not None:
+            if texture_region.owner is not None:
+                uvs = list(texture_region.tex_coords)
+                del uvs[3 - 1::3]  # remove every third(z-component) element
+                uvs[2], uvs[6] = uvs[6], uvs[2]
+                uvs[3], uvs[7] = uvs[7], uvs[3]
 
-            return uvs
-        else:
-            return [0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
+                return uvs
+        return [0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
 
     def _update_vertices(self):
         x = self._anchor[0]
         y = self._anchor[1]
         self.vertices = VertexAttrib(0, 2, np.array(
             [-0.5 - x, -0.5 - y, -0.5 - x, 0.5 - y, 0.5 - x, 0.5 - y, 0.5 - x, -0.5 - y], dtype=np.float32))
+
+    # TODO: Write this method
+    def set_color(self, color):
+        """
+        This method sets the color of the scene object
+        :param color: Each component the color must be inside the [0, 1] range. If this value is a list of 4 tuples
+        of length 4, the vertices of the scene object will be colored in the corresponding colors clockwise.
+        If this value is just a tuple of length 4, then all vertices will have the same color.
+        """
+        pass
 
     def set_anchor(self, x: float, y: float):
         """
@@ -243,7 +291,6 @@ class SceneObject:
 
         # bind texture
         glBindTexture(GL_TEXTURE_2D, self.texture.id)
-        # glUniform1i(glGetUniformLocation(self.shader.program, "texture1"), 0)
 
         # bind element array buffer and data
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo_id)
@@ -254,6 +301,7 @@ class SceneObject:
         # unbind EBO & VBOs(vertex attributes)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
+        # unbind texture
         glBindTexture(GL_TEXTURE_2D, 0)
 
         # unuse shader
