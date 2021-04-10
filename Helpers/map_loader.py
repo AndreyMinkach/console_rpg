@@ -46,10 +46,10 @@ class MapLoader:
             if index % self.map_columns == 0:
                 y -= 1
                 x = _x
-                sc.set_position(x, y)
+                sc.position = (x, y)
             else:
                 x += 1
-                sc.set_position(x, y)
+                sc.position = (x, y)
 
     def _map_initialization(self):
         """
