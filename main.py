@@ -8,6 +8,7 @@ from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
+from Helpers.map_loader import MapLoader
 from Helpers.shader_manager import ShaderManager
 from Scene.camera import Camera
 from Scene.renderer import Renderer
@@ -32,8 +33,8 @@ if __name__ == '__main__':
     hit_test = HitTest(window, UIRenderer.get_main_batch())
     input_helper = InputHelper(window)
     camera = Camera(window)
-    camera.set_zoom(5)
-
+    camera.set_zoom(15)
+    map = MapLoader()
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
     # temp = UIBase(Vector2(610, 200), Vector2(120, 120), image_fill_color=ColorHelper.RED)
