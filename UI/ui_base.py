@@ -1,6 +1,5 @@
 from typing import List
 
-import pyglet
 from pyglet.gl import *
 from pyglet.graphics import Batch, OrderedGroup
 from pyglet.image import AbstractImage
@@ -9,6 +8,7 @@ from pyshaders import ShaderProgram
 
 from Animation.number_field_animation import NumberFieldAnimation
 from Animation.storyboard import Storyboard
+from Helpers.atlas_helper import TextureAtlas
 from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.location_helper import Vector2
@@ -43,11 +43,10 @@ class ScissorGroup(OrderedGroup):
 
 class UIBase(Sprite):
     def __init__(self, position: Vector2, size: Vector2, texture: AbstractImage = None,
-                 image_fill_color=ColorHelper.WHITE, tint_color: (int, int, int, int) = ColorHelper.WHITE,
+                 tint_color: (int, int, int, int) = ColorHelper.WHITE,
                  shader: ShaderProgram = ShaderManager.default_ui_shader()):
         if texture is None:
-            texture = UIRenderer.add_texture(
-                pyglet.image.SolidColorImagePattern(image_fill_color).create_image(size.x, size.y))
+            texture = TextureAtlas.get_texture('default_sprite.png')
 
         super().__init__(texture, x=position.x, y=position.y, batch=UIRenderer.get_main_batch())
 
