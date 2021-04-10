@@ -59,6 +59,7 @@ class SceneObject:
         collector will not necessarily call the finalizer as soon as the
         sprite is garbage.
         """
+        Renderer.remove_scene_object_from_render_loop(self)
         if self._animation:
             clock.unschedule(self._animate)
         self.vertex_list.delete()
