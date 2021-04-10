@@ -1,7 +1,48 @@
+import warnings
+
 import pyshaders
-from pyglet.gl import glDeleteProgram
+from pyglet.gl import glDeleteProgram, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+from pyglet.sprite import SpriteGroup
 from pyshaders import ShaderProgram
 
+from UI.ui_renderer import UIRenderer
+
+default_vs = """
+#version 330 core
+
+layout(location = 0)in vec2 vertices;
+layout(location = 1)in vec4 colors;
+layout(location = 2)in vec3 tex_coords;
+
+varying vec4 vertex_pos;
+varying vec2 vertex_uv;
+varying vec4 vertex_color;
+
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+void main()
+{
+    vertex_pos = projectionMatrix *  viewMatrix * vec4(vertices, 0.0, 1.0);
+    gl_Position = vertex_pos;
+    vertex_uv = tex_coords.xy;
+    vertex_color = colors;
+}
+"""
+default_fs = """
+#version 330 core
+
+uniform sampler2D tex;
+
+varying vec4 vertex_pos;
+varying vec2 vertex_uv;
+varying vec4 vertex_color;
+
+void main(void) 
+{
+    gl_FragColor = texture2D(tex, vertex_uv) * vertex_color;
+}
+"""
 default_ui_vs = """
 #version 330 core
 
@@ -25,7 +66,7 @@ void main()
     vertex_pos = to_clip_space(vertices);
     gl_Position = vec4(vertex_pos, 0.0, 1.0);
     vertex_uv = tex_coords.xy;
-    vertex_color = colors / 255,0;
+    vertex_color = colors / 255.0;
 }
 """
 default_ui_fs = """
@@ -156,12 +197,65 @@ void main(void)
 }
 """
 
+pyshaders.transpose_matrices(False)
+
+
+class UniformSetter:
+    def __init__(self, shader: ShaderProgram):
+        self.shader = shader
+        self._uniforms = {}
+        self._need_to_update = True
+        for i in self.shader.uniforms:
+            uniform_name = i[0]
+            uniform_value = self.shader.uniforms.__getattr__(uniform_name)
+            if uniform_value is not None and uniform_name != 'screen_size':
+                self._uniforms[uniform_name] = [uniform_value, type(uniform_value)]
+
+    def set_uniform(self, name: str, value):
+        if name in self._uniforms.keys():
+            uniform_list = self._uniforms[name]
+            uniform_list[0] = value
+            self._need_to_update = True
+        else:
+            warnings.warn(f"There is no uniform named '{name}' in the shader!!")
+
+    def set_uniforms(self, uniform_dict: dict):
+        for key, value in uniform_dict.items():
+            self.set_uniform(key, value)
+
+    def apply(self):
+        if self._need_to_update:
+            for key, value in self._uniforms.items():
+                self.shader.uniforms.__setattr__(key, value[0])
+            self._need_to_update = False
+
+
+class ShadedGroup(SpriteGroup):
+    def __init__(self, texture, shader: ShaderProgram, uniform_setter: UniformSetter, parent=None,
+                 blend_src: int = GL_SRC_ALPHA,
+                 blend_dest: int = GL_ONE_MINUS_SRC_ALPHA):
+        super().__init__(texture, blend_src, blend_dest, parent)
+        self.shader: ShaderProgram = shader
+        self.uniform_setter = uniform_setter
+
+    def set_state(self):
+        super().set_state()
+        self.shader.use()
+        if 'screen_size' in self.shader.uniforms:
+            self.shader.uniforms.screen_size = UIRenderer.get_window_size()
+        self.uniform_setter.apply()
+
+    def unset_state(self):
+        super().unset_state()
+        self.shader.clear()
+
 
 class ShaderManager:
     _instance: 'ShaderManager' = None
 
     def __init__(self):
         self.__class__._instance = self
+        self.default_shader: ShaderProgram = pyshaders.from_string(default_vs, default_fs)
         self.default_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, default_ui_fs)
         self.outline_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, outline_ui_fs)
         self.blur_ui_shader: ShaderProgram = pyshaders.from_string(default_ui_vs, blur_ui_fs)
@@ -179,6 +273,10 @@ class ShaderManager:
         cls._delete_shader(cls._instance.outline_ui_shader)
         cls._delete_shader(cls._instance.blur_ui_shader)
         cls._delete_shader(cls._instance.vignette_ui_shader)
+
+    @classmethod
+    def default_shader(cls):
+        return cls._instance.default_shader
 
     @classmethod
     def default_ui_shader(cls):

@@ -1,0 +1,13 @@
+PyOpenGL==3.1.5
+pyrr==0.10.3
+numpy==1.20.2
+aiofiles==0.5.0
+autoprop==1.0.2
+colorama==0.4.3
+Cython==0.29.21
+more-itertools==8.5.0
+Pillow==7.2.0
+pyglet==1.5.8
+pyshaders==1.4.1
+PyYAML==5.3.1
+vecrec==0.3.0

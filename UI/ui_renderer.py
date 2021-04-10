@@ -8,8 +8,8 @@ from pyglet.sprite import Sprite
 from Helpers.hit_test import HitTest
 
 
-class Renderer:
-    _instance: 'Renderer' = None
+class UIRenderer:
+    _instance: 'UIRenderer' = None
 
     def __init__(self):
         self.__class__._instance = self
@@ -43,12 +43,13 @@ class Renderer:
         return texture_region
 
     @classmethod
-    def load_image(cls, image_path: str, folder: str = 'Static/Images/', border=0):
+    def load_image(cls, image_path: str, folder: str = 'Static/Images/', border=0) -> TextureRegion:
         return cls.add_texture(pyglet.image.load(folder + image_path), border)
 
     @classmethod
     def draw(cls):
-        HitTest.draw()
+        # TODO: Rewrite HitTest
+        # HitTest.draw()
         cls._instance._main_batch.invalidate()
         cls._instance._main_batch.draw()
 

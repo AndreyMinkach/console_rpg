@@ -3,7 +3,8 @@ from pyglet.gl import *
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.shader_manager import ShaderManager
-from UI.renderer import Renderer
+from Scene.renderer import Renderer
+from UI.ui_renderer import UIRenderer
 
 
 class MyWindow(pyglet.window.Window):
@@ -13,7 +14,7 @@ class MyWindow(pyglet.window.Window):
         self.set_location((self.screen.width - self.width) // 2, (self.screen.height - self.height) // 2)
         self.clear_color = ColorHelper.DARK
         self.total_ticks = 0
-        Renderer.set_window_size((self.width, self.height))
+        UIRenderer.set_window_size((self.width, self.height))
         glClearColor(*[i / 255.0 for i in self.clear_color])
         glEnable(GL_TEXTURE_2D and GL_BLEND and GL_ALPHA_TEST)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -24,10 +25,14 @@ class MyWindow(pyglet.window.Window):
 
     def on_draw(self):
         self.clear()
+
         Renderer.draw()
+        UIRenderer.draw()
+
+        self.invalid = False
 
     def update(self, dt):
-        Renderer.update_logic()
+        UIRenderer.update_logic()
 
         # input helper should be updated after all other logic
         InputHelper.update()
@@ -38,3 +43,6 @@ class MyWindow(pyglet.window.Window):
     def on_close(self):
         ShaderManager.close()
         self.close()
+
+    def get_aspect_ratio(self) -> float:
+        return self.width / self.height

@@ -58,6 +58,7 @@ class InputHelper:
     def on_mouse_motion(self, x, y, dx, dy):
         self._mouse_pos = Vector2(x, y)
         self._mouse_pos_delta = Vector2(dx, dy)
+        self.window.invalid = True
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         self._mouse_pos = Vector2(x, y)
