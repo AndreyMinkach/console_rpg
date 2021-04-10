@@ -1,172 +1,100 @@
-from math import radians
-import numpy as np
+import math
+
+import pyglet
 import pyglet.clock as clock
 from pyglet.image import TextureRegion, Animation
-from pyrr import Matrix44
 
-from typing import Any
-from OpenGL.GL import *
-
+from Helpers.shader_manager import ShaderManager
 from Scene.camera import Camera
 from Scene.renderer import Renderer
-
-VS = '''
-#version 330 core
-
-layout(location = 0)in vec2 vertices;
-layout(location = 1)in vec4 colors;
-layout(location = 2)in vec2 uvs;
-
-varying vec4 vertex_pos;
-varying vec4 vertex_color;
-varying vec2 vertex_uv;
-
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
-
-out vec4 color;
-
-void main ()
-{
-    vertex_pos = projectionMatrix * viewMatrix * modelMatrix * vec4(vertices, 0.0, 1.0);
-    vertex_color = colors;
-    vertex_uv = uvs;
-    gl_Position = vertex_pos;
-}
-'''
-
-FS = '''
-#version 330 core
-
-varying vec4 vertex_pos;
-varying vec4 vertex_color;
-varying vec2 vertex_uv;
-
-out vec4 FragColor;
-
-uniform sampler2D texture1;
-
-void main()
-{
-    FragColor = texture(texture1, vertex_uv) * vertex_color;
-}
-'''
-
-
-class Shader:
-    def __init__(self, vs_source: str, fs_source: str) -> None:
-        self.program = glCreateProgram()
-        self.compile(vs_source, fs_source)
-
-    def __del__(self) -> None:
-        glUseProgram(0)
-        glDeleteProgram(self.program)
-
-    @staticmethod
-    def load_shader(src: str, shader_type: int) -> int:
-        shader = glCreateShader(shader_type)
-        glShaderSource(shader, src)
-        glCompileShader(shader)
-        compile_status = glGetShaderiv(shader, GL_COMPILE_STATUS)
-        if compile_status != GL_TRUE:
-            info = glGetShaderInfoLog(shader)
-            glDeleteShader(shader)
-            raise Exception(info)
-        return shader
-
-    def compile(self, vs_src: str, fs_src: str) -> None:
-        vs = self.load_shader(vs_src, GL_VERTEX_SHADER)
-        fs = self.load_shader(fs_src, GL_FRAGMENT_SHADER)
-        if not vs or not fs:
-            return
-        glAttachShader(self.program, vs)
-        glAttachShader(self.program, fs)
-        glLinkProgram(self.program)
-        link_status = glGetProgramiv(self.program, GL_LINK_STATUS)
-        glDeleteShader(vs)
-        glDeleteShader(fs)
-        if link_status != GL_TRUE:
-            info = glGetShaderInfoLog(self.program)
-            raise Exception(info)
-
-    def set_matrix4x4(self, uniform_name: str, value):
-        location = glGetUniformLocation(self.program, uniform_name)
-        glUniformMatrix4fv(location, 1, GL_FALSE, value)
-
-    def use(self):
-        glUseProgram(self.program)
-
-    @staticmethod
-    def unuse():
-        glUseProgram(0)
-
-
-class VertexAttrib:
-    def __init__(self, slot: int, stride: int, data: Any):
-        self.buffer_id = glGenBuffers(1)
-        self.slot = slot
-        self.stride = stride
-        self.data = data
-
-    def set_vertex_attribute(self, attrib_type=GL_FLOAT):
-        glBindBuffer(GL_ARRAY_BUFFER, self.buffer_id)
-        glBufferData(GL_ARRAY_BUFFER, 4 * len(self.data), self.data, GL_STATIC_DRAW)
-        glEnableVertexAttribArray(self.slot)
-        glVertexAttribPointer(self.slot, self.stride, attrib_type, GL_FALSE, 0, None)
-
-    def __del__(self) -> None:
-        glDeleteBuffers(1, [self.buffer_id])
+from UI.ui_base import ShadedGroup, UniformSetter
 
 
 class SceneObject:
-    def __init__(self, image) -> None:
-        self._anchor: tuple = (0.0, 0.0)
-        self._position: list = [0] * 3
+
+    def __init__(self, image, position=(0, 0), batch=None, group=None, shader=ShaderManager.default_shader()):
+        self._anchor: tuple = (0.5, 0.5)
+        self._color: tuple = (1.0, 1.0, 1.0)
+        self._position: tuple = position
         self._rotation: float = 0.0
-        self._scale: list = [1.0] * 3
+        self._scale: tuple = (1.0, 1.0)
 
         # animation data
+        self._animation = None
         self._is_animation_playing: bool = False
         self._frame_index: int = 0
 
         if isinstance(image, Animation):
             self._animation = image
-            self.texture: TextureRegion = image.frames[0].image.get_texture()
+            self._texture: TextureRegion = image.frames[0].image.get_texture()
         else:
-            self.texture: TextureRegion = image
+            self._animation = None
+            self._texture: TextureRegion = image
 
-        self.texture_coords: list = self._get_texture_uv(self.texture)
+        self.shader = shader
+        self.uniforms = UniformSetter(self.shader)
+        self._batch = batch if batch is not None else Renderer.batch()
+        self._group = ShadedGroup(self._texture, self.shader, self.uniforms,
+                                  parent=group if group is not None else Renderer.group())
 
-        self.shader = Shader(VS, FS)
-        # OpenGL data
-        self.vertices = VertexAttrib(0, 2, np.array([-0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5], dtype=np.float32))
-        self.colors = VertexAttrib(1, 4, np.array([1.0, 1.0, 1.0, 1.0] * 4, dtype=np.float32))
-        self.uvs = VertexAttrib(2, 2, np.array(self.texture_coords, dtype=np.float32))
-        self.indices = np.array([0, 1, 2, 2, 3, 0], dtype=np.int32)
-        self.ebo_id = glGenBuffers(1)
+        self._create_vertex_list()
 
-        # matrices
-        self._translation_matrix: Matrix44 = Matrix44.from_translation(self._position)
-        self._rotation_matrix: Matrix44 = Matrix44.from_z_rotation(self._rotation)
-        self._scale_matrix: Matrix44 = Matrix44.from_scale(self._scale)
-        self._model_matrix = np.array(self._translation_matrix * self._rotation_matrix * self._scale_matrix,
-                                      dtype=np.float32)
-
-        self.test_angle = 0
+        # TODO: Make automatic update of the camera matrices
+        self.uniforms.set_uniforms(dict(viewMatrix=Camera.get_view_matrix(),
+                                        projectionMatrix=Camera.get_camera_matrix()))
 
         Renderer.add_scene_object_to_render_loop(self)
 
+    def __del__(self):
+        try:
+            if self.vertex_list is not None:
+                self.vertex_list.delete()
+        except:
+            pass
+
+    def delete(self):
+        """Force immediate removal of the sprite from video memory.
+
+        This is often necessary when using batches, as the Python garbage
+        collector will not necessarily call the finalizer as soon as the
+        sprite is garbage.
+        """
+        if self._animation:
+            clock.unschedule(self._animate)
+        self.vertex_list.delete()
+        self.vertex_list = None
+        self._texture = None
+
+        # Easy way to break circular reference, speeds up GC
+        self._group = None
+
+    def _create_vertex_list(self):
+        self.vertex_list = self._batch.add(
+            4, pyglet.gl.GL_QUADS, self._group, 'v2f', 'c4f', ('t3f', self._texture.tex_coords))
+        self._update_vertices()
+        self._update_color()
+
+    def _set_texture(self, texture):
+        if texture.id is not self._texture.id:
+            self._group = ShadedGroup(texture, self.shader, self.uniforms, self._group.parent)
+            if self._batch is None:
+                self.vertex_list.tex_coords[:] = texture.tex_coords
+            else:
+                self.vertex_list.delete()
+                self._texture = texture
+                self._create_vertex_list()
+        else:
+            self.vertex_list.tex_coords[:] = texture.tex_coords
+        self._texture = texture
+
     def _animate(self, dt=0):
-        if not self._is_animation_playing:
+        if not self._is_animation_playing or self._animation is None:
             return
         if self._frame_index >= len(self._animation.frames):
             self._frame_index = 0
 
         frame = self._animation.frames[self._frame_index]
-        self.texture = frame.image.get_texture()
-        self.texture_coords: list = self._get_texture_uv(self.texture)
-        self.uvs.data = np.array(self.texture_coords, dtype=np.float32)
+        self._set_texture(frame.image.get_texture())
         clock.schedule_once(self._animate, frame.duration)
         self._frame_index += 1
 
@@ -174,6 +102,8 @@ class SceneObject:
         """
         Starts animation playing
         """
+        if self._animation is None:
+            return
         self._is_animation_playing = True
         self._frame_index = 0
 
@@ -205,22 +135,85 @@ class SceneObject:
         return [0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0]
 
     def _update_vertices(self):
-        x = self._anchor[0]
-        y = self._anchor[1]
-        self.vertices = VertexAttrib(0, 2, np.array(
-            [-0.5 - x, -0.5 - y, -0.5 - x, 0.5 - y, 0.5 - x, 0.5 - y, 0.5 - x, -0.5 - y], dtype=np.float32))
+        img = self._texture
+        scale_x = self._scale[0]
+        scale_y = self._scale[1]
+        if self._rotation != 0.0:
+            x1 = -self._anchor[0] * scale_x
+            y1 = -self._anchor[1] * scale_y
+            x2 = x1 + 1 * scale_x
+            y2 = y1 + 1 * scale_y
+            x = self._position[0]
+            y = self._position[1]
 
-    # TODO: Write this method
-    def set_color(self, color):
+            r = -math.radians(self._rotation)
+            cr = math.cos(r)
+            sr = math.sin(r)
+            ax = x1 * cr - y1 * sr + x
+            ay = x1 * sr + y1 * cr + y
+            bx = x2 * cr - y1 * sr + x
+            by = x2 * sr + y1 * cr + y
+            cx = x2 * cr - y2 * sr + x
+            cy = x2 * sr + y2 * cr + y
+            dx = x1 * cr - y2 * sr + x
+            dy = x1 * sr + y2 * cr + y
+            vertices = (ax, ay, bx, by, cx, cy, dx, dy)
+        elif scale_x != 1.0 or scale_y != 1.0:
+            x1 = self._position[0] - self._anchor[0] * scale_x
+            y1 = self._position[1] - self._anchor[1] * scale_y
+            x2 = x1 + 1 * scale_x
+            y2 = y1 + 1 * scale_y
+            vertices = (x1, y1, x2, y1, x2, y2, x1, y2)
+        else:
+            x1 = self._position[0] - self._anchor[0]
+            y1 = self._position[1] - self._anchor[1]
+            x2 = x1 + 1
+            y2 = y1 + 1
+            vertices = (x1, y1, x2, y1, x2, y2, x1, y2)
+        self.vertex_list.vertices[:] = vertices
+
+    def _update_color(self):
+        r, g, b = self._color
+        self.vertex_list.colors[:] = [r, g, b, 1.0] * 4
+
+    @property
+    def texture(self):
+        return self._texture
+
+    @texture.setter
+    def texture(self, value):
+        if self._animation is not None:
+            self.stop_animation()
+            self._animation = None
+
+        if isinstance(value, Animation):
+            self._animation = value
+            self._set_texture(value.frames[0].image.get_texture())
+        else:
+            self._set_texture(value.get_texture())
+
+    @property
+    def color(self) -> (float, float, float):
+        return self._color
+
+    @color.setter
+    def color(self, value: (float, float, float)):
         """
         This method sets the color of the scene object
-        :param color: Each component the color must be inside the [0, 1] range. If this value is a list of 4 tuples
-        of length 4, the vertices of the scene object will be colored in the corresponding colors clockwise.
-        If this value is just a tuple of length 4, then all vertices will have the same color.
+        :param value: Color of all the vertices of the object.
+        Each component the color must be inside the [0, 1] range.
+        Examples:
+            color = (1.0, 1.0, 1.0) - set white color for all the vertices
         """
-        pass
+        self._color = value
+        self._update_color()
 
-    def set_anchor(self, x: float, y: float):
+    @property
+    def anchor(self) -> (float, float):
+        return self._anchor
+
+    @anchor.setter
+    def anchor(self, value: (float, float)):
         """
         Sets anchor point of the scene object. All the rotations of the scene object will be made around
          the anchor point
@@ -229,80 +222,55 @@ class SceneObject:
             (x=-0.5, y=-0.5) means that the object's center will be placed at bottom left corner
             (x=0.5, y=0.5) means that the object's center will be placed at upper right corner
 
-        :param x: Horizontal position
-        :param y: Vertical position
+        :param value: Tuple of format (x, y) that represents the horizontal and vertical anchor of the object
         """
-        self._anchor = (x, y)
+        self._anchor = value
         self._update_vertices()
 
-    def set_position(self, x: float, y: float):
+    @property
+    def position(self) -> (float, float):
+        return self._position
+
+    @position.setter
+    def position(self, value: (float, float)):
         """
         Sets the position of the scene object in world space
-        :param x: Horizontal position
-        :param y: Vertical position
+        :param value: Tuple of format (x, y) that represents the horizontal and vertical position of the object
         """
-        self._position = [x, y, 0]
-        self._translation_matrix = Matrix44.from_translation(self._position)
-        self._model_matrix = np.array(self._translation_matrix * self._rotation_matrix * self._scale_matrix,
-                                      dtype=np.float32)
+        self._position = value
+        self._update_vertices()
 
     def add_position(self, x: float, y: float):
         """
         Adds the input (x, y) vector to the existing scene object position
         """
-        self.set_position(self._position[0] + x, self._position[1] + y)
+        self.position = (self._position[0] + x, self._position[1] + y)
 
-    def set_rotation(self, angle: float):
+    @property
+    def rotation(self) -> float:
+        """
+        Represents an rotation(in degrees) of the object
+        """
+        return self._rotation
+
+    @rotation.setter
+    def rotation(self, angle: float):
         """
         Sets the rotation of the scene object
         :param angle: Angle value in degrees
         """
-        self._rotation = radians(angle)
-        self._rotation_matrix: Matrix44 = Matrix44.from_z_rotation(self._rotation)
-        self._model_matrix = np.array(self._translation_matrix * self._rotation_matrix * self._scale_matrix,
-                                      dtype=np.float32)
+        self._rotation = angle
+        self._update_vertices()
 
-    def set_scale(self, x: float, y: float):
+    @property
+    def scale(self) -> (float, float):
+        return self._scale
+
+    @scale.setter
+    def scale(self, value: (float, float)):
         """
         Sets the scale of the scene object at x and y axes
-        :param x: Horizontal scale
-        :param y: Vertical scale
+        :param value: Tuple of format (x, y) that represents the horizontal and vertical scale of the object
         """
-        self._scale = [x, y, 1]
-        self._scale_matrix: Matrix44 = Matrix44.from_scale(self._scale)
-        self._model_matrix = np.array(self._translation_matrix * self._rotation_matrix * self._scale_matrix,
-                                      dtype=np.float32)
-
-    def __del__(self) -> None:
-        glDeleteBuffers(1, [self.ebo_id])
-        Renderer.remove_scene_object_to_render_loop(self)
-
-    def draw(self) -> None:
-        self.shader.use()
-
-        self.shader.set_matrix4x4('modelMatrix', self._model_matrix)
-        self.shader.set_matrix4x4('viewMatrix', Camera.get_view_matrix())
-        self.shader.set_matrix4x4('projectionMatrix', Camera.get_camera_matrix())
-
-        # set attributes
-        self.vertices.set_vertex_attribute()
-        self.colors.set_vertex_attribute()
-        self.uvs.set_vertex_attribute()
-
-        # bind texture
-        glBindTexture(GL_TEXTURE_2D, self.texture.id)
-
-        # bind element array buffer and data
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo_id)
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * self.indices.size, self.indices, GL_STATIC_DRAW)
-        # draw indexed array data
-        glDrawElements(GL_TRIANGLES, self.indices.size, GL_UNSIGNED_INT, None)
-
-        # unbind EBO & VBOs(vertex attributes)
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-        # unbind texture
-        glBindTexture(GL_TEXTURE_2D, 0)
-
-        # unuse shader
-        self.shader.unuse()
+        self._scale = value
+        self._update_vertices()
