@@ -14,7 +14,7 @@ layout(location = 0)in vec2 vertices;
 layout(location = 1)in vec4 colors;
 layout(location = 2)in vec3 tex_coords;
 
-varying vec4 vertex_pos;
+varying vec2 vertex_pos;
 varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
@@ -23,8 +23,8 @@ uniform mat4 projectionMatrix;
 
 void main()
 {
-    vertex_pos = projectionMatrix *  viewMatrix * vec4(vertices, 0.0, 1.0);
-    gl_Position = vertex_pos;
+    vertex_pos = vertices;
+    gl_Position = projectionMatrix *  viewMatrix * vec4(vertices, 0.0, 1.0);
     vertex_uv = tex_coords.xy;
     vertex_color = colors;
 }
@@ -32,15 +32,30 @@ void main()
 default_fs = """
 #version 330 core
 
-uniform sampler2D tex;
-
-varying vec4 vertex_pos;
+varying vec2 vertex_pos;
 varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
-void main(void) 
+uniform sampler2D tex;
+
+vec4 ambientLight = vec4(vec3(255, 224, 179) / 255.0, 0.1); // rbg - color, a - light strength
+vec3 pointLight = vec3(0.0, 0.0, 5); // xy - light position, z - light radius
+vec3 pointLightColor = vec3(255, 153, 204) / 255.0;
+
+void main(void)
 {
-    gl_FragColor = texture2D(tex, vertex_uv) * vertex_color;
+    vec4 color = texture2D(tex, vertex_uv) * vertex_color;
+    
+    vec2 toLight = (pointLight.xy - vertex_pos);
+    
+    float attenuation = clamp(1.0 - (length(toLight) / pointLight.z), 0.0, 1.0);
+    
+    vec4 light1 = vec4(ambientLight.rgb * ambientLight.a, 1.0);
+    vec4 light2 = vec4(pointLightColor * attenuation, pow(attenuation, 3));
+    vec4 totalLight = light1 + light2;
+    
+    vec4 pixelColor = color * clamp(totalLight, 0.0, 1.0);
+    gl_FragColor = clamp(pixelColor, 0.0, 1.0);
 }
 """
 default_ui_vs = """

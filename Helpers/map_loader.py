@@ -1,13 +1,13 @@
 import json
 
 import Helpers.helper as helper
+from Helpers.atlas_helper import TextureAtlas
 from Scene.scene_object import SceneObject
-from UI.ui_renderer import UIRenderer
 
 
 class MapLoader:
     def __init__(self, map_json_filename='map.json', tileset_filename='tileset.png', folder=r'Static/Tileset/'):
-        self.tileset_image = UIRenderer.load_image(image_path=tileset_filename, folder=folder)
+        self.tileset_image = TextureAtlas.load_image(image_path=tileset_filename, folder=folder)
         self.map_dict = self._load_json(map_json_filename)
         self.tile_size = self.map_dict['tilewidth']
         self.image_height = self.map_dict['tilesets'][0]['imageheight']
