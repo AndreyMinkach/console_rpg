@@ -37,7 +37,7 @@ if __name__ == '__main__':
     map = MapLoader()
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
-    # temp = UIBase(Vector2(610, 200), Vector2(120, 120), image_fill_color=ColorHelper.RED)
+    # temp = UIBase(Vector2(300, 200), Vector2(120, 120), tint_color=ColorHelper.RED)
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()
