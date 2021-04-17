@@ -1,3 +1,6 @@
+from math import sqrt
+
+
 class Vector2:
     """
     This class is used only for ui objects to represent the size or coordinates in screen space
@@ -5,11 +8,11 @@ class Vector2:
     zero: 'Vector2' = None
     one: 'Vector2' = None
 
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
 
-    def tuple(self) -> (int, int):
+    def tuple(self) -> (float, float):
         return self.x, self.y
 
     def __add__(self, other):
@@ -20,14 +23,21 @@ class Vector2:
 
     def __mul__(self, other):
         if isinstance(other, Vector2):
-            return Vector2(self.x - other.x, self.y - other.y)
-        elif isinstance(other, int):
-            return Vector2(self.x * other, self.y * other)
+            return Vector2(self.x * other.x, self.y * other.y)
         else:
-            return self
+            return Vector2(self.x * other, self.y * other)
 
     def __repr__(self):
         return f"({self.x}, {self.y})"
+
+    def length(self):
+        return sqrt(self.x ** 2 + self.y ** 2)
+
+    def normalize(self):
+        length = self.length()
+        if length == 0:
+            return Vector2.zero
+        return self * (1 / length)
 
 
 Vector2.zero = Vector2(0, 0)

@@ -2,8 +2,10 @@ from pyglet.gl import *
 
 import configs
 from Animation.storyboard import Storyboard
+from Creatures.player import Player
 from Gameplay.Location.location_manager import LocationManager
 from Gameplay.Quests.quest_manager import QuestManager
+from Helpers.atlas_helper import TextureAtlas
 from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.input_helper import InputHelper
@@ -38,6 +40,6 @@ if __name__ == '__main__':
     temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
     # temp = UIBase(Vector2(300, 200), Vector2(120, 120), tint_color=ColorHelper.RED)
-
+    player = Player(TextureAtlas.get_texture('default_sprite.png'))
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

@@ -1,5 +1,6 @@
 from pyglet.gl import *
 
+from Creatures.player import Player
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.shader_manager import ShaderManager
@@ -33,6 +34,8 @@ class MyWindow(pyglet.window.Window):
 
     def update(self, dt):
         UIRenderer.update_logic()
+
+        Player.update(dt)
 
         # input helper should be updated after all other logic
         InputHelper.update()
