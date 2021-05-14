@@ -12,7 +12,7 @@ from UI.ui_base import ShadedGroup, UniformSetter
 
 class SceneObject:
 
-    def __init__(self, image, position=(0, 0), batch=None, group=None, shader=ShaderManager.default_shader()):
+    def __init__(self, image, position=(0, 0), batch=None, group=None, shader: str = 'default'):
         self._anchor: tuple = (0.5, 0.5)
         self._color: tuple = (1.0, 1.0, 1.0)
         self._position: tuple = position
@@ -31,7 +31,7 @@ class SceneObject:
             self._animation = None
             self._texture: TextureRegion = image
 
-        self.shader = shader
+        self.shader = ShaderManager.get_shader_by_name(shader)
         self.uniforms = UniformSetter(self.shader)
         self._batch = batch if batch is not None else Renderer.batch()
         self._group = ShadedGroup(self._texture, self.shader, self.uniforms,

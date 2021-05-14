@@ -4,6 +4,7 @@ import configs
 from Animation.storyboard import Storyboard
 from Gameplay.Location.location_manager import LocationManager
 from Gameplay.Quests.quest_manager import QuestManager
+from Helpers.atlas_helper import TextureAtlas
 from Helpers.color_helper import ColorHelper
 from Helpers.hit_test import HitTest
 from Helpers.input_helper import InputHelper
@@ -29,15 +30,28 @@ location_manager = LocationManager()
 
 if __name__ == '__main__':
     window = MyWindow(configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT, caption=configs.WINDOW_TITLE, resizable=False,
-                      vsync=True)
+                      vsync=False)
     hit_test = HitTest(window, UIRenderer.get_main_batch())
     input_helper = InputHelper(window)
     camera = Camera(window)
     camera.set_zoom(15)
-    map = MapLoader()
-    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
+    map_loader = MapLoader()
+
+    temp_sprite = UISprite("image.png", Vector2.zero, Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
     # temp = UIBase(Vector2(300, 200), Vector2(120, 120), tint_color=ColorHelper.RED)
+
+    image1 = pyglet.image.load('Static/Images/lighting_test_1.png').get_texture()
+    temp1 = SceneObject(image1, shader='polar_transform')
+    temp1.scale = (29, 29)
+    image2 = pyglet.image.load('Static/Images/lighting_test_2.png').get_texture()
+    temp2 = SceneObject(image2, shader='shadows')
+    temp2.scale = (29, 29)
+    temp2.position = (-2, 0)
+    image3 = pyglet.image.load('Static/Images/lighting_test_3.png').get_texture()
+    temp3 = SceneObject(image3, shader='inverse_polar')
+    temp3.scale = (29, 29)
+    temp3.position = (-4, 0)
 
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

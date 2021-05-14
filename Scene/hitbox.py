@@ -1,0 +1,2 @@
+class HitBox:
+    pass

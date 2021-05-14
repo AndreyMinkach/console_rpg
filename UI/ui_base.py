@@ -4,7 +4,6 @@ from pyglet.gl import *
 from pyglet.graphics import Batch, OrderedGroup
 from pyglet.image import AbstractImage
 from pyglet.sprite import Sprite
-from pyshaders import ShaderProgram
 
 from Animation.number_field_animation import NumberFieldAnimation
 from Animation.storyboard import Storyboard
@@ -43,8 +42,7 @@ class ScissorGroup(OrderedGroup):
 
 class UIBase(Sprite):
     def __init__(self, position: Vector2, size: Vector2, texture: AbstractImage = None,
-                 tint_color: (int, int, int, int) = ColorHelper.WHITE,
-                 shader: ShaderProgram = ShaderManager.default_ui_shader()):
+                 tint_color: (int, int, int, int) = ColorHelper.WHITE, shader: str = 'default_ui'):
         if texture is None:
             texture = TextureAtlas.get_texture('default_sprite.png')
 
@@ -53,7 +51,7 @@ class UIBase(Sprite):
         self._position = position
         self._size = Vector2(texture.width, texture.height)
         self._is_removing = False
-        self.shader = shader
+        self.shader = ShaderManager.get_shader_by_name(shader)
         self.uniforms = UniformSetter(self.shader)
         self.color = tint_color if len(tint_color) == 3 else tint_color[:3]
         self._enabled = True
