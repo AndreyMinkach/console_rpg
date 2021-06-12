@@ -3,6 +3,7 @@ from pyglet.gl import *
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
 from Helpers.shader_manager import ShaderManager
+from Scene.PostProcessing.post_effect import PostEffect
 from Scene.renderer import Renderer
 from UI.ui_renderer import UIRenderer
 
@@ -23,11 +24,27 @@ class MyWindow(pyglet.window.Window):
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
+        self.polar_trs_effect = PostEffect(1280, 680, 'polar_transform_pps')
+        self.shadows_effect = PostEffect(1280, 680, 'shadows_pps')
+        self.inverse_polar_effect = PostEffect(1280, 680, 'inverse_polar_pps')
+
     def on_draw(self):
         self.clear()
 
+        self.polar_trs_effect.bind()
         Renderer.draw()
         UIRenderer.draw()
+        self.polar_trs_effect.unbind()
+
+        self.shadows_effect.bind()
+        self.polar_trs_effect.render()
+        self.shadows_effect.unbind()
+
+        self.inverse_polar_effect.bind()
+        self.shadows_effect.render()
+        self.inverse_polar_effect.unbind()
+
+        self.inverse_polar_effect.render()
 
         self.invalid = False
 

@@ -139,14 +139,16 @@ class ShaderManager:
         # initialize shader programs
         for fs_name, fs_code in self._fragment_shaders.items():
             try:
-                if '_pps' in fs_name:  # is this shader a post-processing shader?
-                    vs_code = None
-                else:
-                    if fs_name in self._vertex_shaders:  # is there a vertex shader with the same name?
-                        vs_name = fs_name
-                    else:  # use default vertex shader
-                        vs_name = 'default_ui' if '_ui' in fs_name else 'default'
-                    vs_code = self._vertex_shaders[vs_name]
+                if fs_name in self._vertex_shaders:  # is there a vertex shader with the same name?
+                    vs_name = fs_name
+                else:  # use default vertex shader
+                    if '_pps' in fs_name:  # is this shader a post-processing shader?
+                        vs_name = 'default_pps'
+                    elif '_ui' in fs_name:  # is this shader a ui shader?
+                        vs_name = 'default_ui'
+                    else:
+                        vs_name = 'default'
+                vs_code = self._vertex_shaders[vs_name]
                 self._shader_programs[fs_name] = self._from_string(vs_code, fs_code)
             except Exception as e:
                 print("Compilation of \'{0}\' shader failed!"

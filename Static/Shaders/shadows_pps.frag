@@ -2,10 +2,9 @@
 
 varying vec2 vertex_pos;
 varying vec2 vertex_uv;
-varying vec4 vertex_color;
 
 uniform sampler2D tex;
-uniform int pixels_to_skip = 5; // the more number the better performance
+uniform int pixels_to_skip = 1; // the more number the better performance
 
 void main(void)
 {

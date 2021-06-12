@@ -6,7 +6,6 @@
 
 varying vec2 vertex_pos;
 varying vec2 vertex_uv;
-varying vec4 vertex_color;
 
 uniform sampler2D tex;
 
