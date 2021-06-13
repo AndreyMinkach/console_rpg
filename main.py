@@ -9,8 +9,10 @@ from Helpers.input_helper import InputHelper
 from Helpers.location_helper import Vector2
 from Helpers.map_loader import MapLoader
 from Scene.camera import Camera
+from Scene.hitbox import HitBox
 from Scene.renderer import Renderer
 from Scene.scene_object import SceneObject
+from Scene.spatial_hash import SpatialHash
 from UI.ui_renderer import UIRenderer
 from UI.ui_sprite import UISprite
 from UI.window import MyWindow
@@ -29,6 +31,25 @@ if __name__ == '__main__':
     camera = Camera(window)
     camera.set_zoom(15)
     # map_loader = MapLoader()
+    SpatialHash(Vector2(100, 100), Vector2(5, 5))
+
+    import random
+    from timeit import timeit
+
+    random.seed(0)
+
+    for _ in range(100):
+        for _ in range(100):
+            x = random.randrange(0, 98)
+            y = random.randrange(0, 98)
+            temp = HitBox(Vector2(x, y), Vector2.one)
+
+    hitbox1 = HitBox(Vector2(54, 48), Vector2.one, action=lambda other: print(other.position))
+    # nearby_objects = SpatialHash.get_nearby(hitbox1)
+    print(timeit(lambda: SpatialHash.get_nearby(hitbox1), number=100) * 1000)
+    # print(timeit(lambda: hitbox1.update(), number=100) * 1000)
+    # hitbox1.update()
+    hitbox1.position = Vector2(70, 30)
 
     temp_sprite = UISprite("image.png", Vector2(200, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
