@@ -3,6 +3,7 @@ from pyglet.gl import *
 import configs
 from Animation.storyboard import Storyboard
 from Creatures.player import Player
+from Creatures.zombie import Weapon
 from Gameplay.Location.location_manager import LocationManager
 from Gameplay.Quests.quest_manager import QuestManager
 from Helpers.atlas_helper import TextureAtlas
@@ -20,7 +21,6 @@ from UI.ui_base import UIBase
 from UI.ui_button import UIButton
 from UI.ui_scrollable_container import ScrollableContainer
 from UI.ui_sprite import UISprite
-from UI.ui_text import UIText
 from UI.window import MyWindow
 
 ui_renderer = UIRenderer()
@@ -37,9 +37,8 @@ if __name__ == '__main__':
     camera = Camera(window)
     camera.set_zoom(15)
     map = MapLoader()
-    temp_sprite = UISprite("image.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
+    temp_sprite = UISprite("cat_movement.png", Vector2(610, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)
-    # temp = UIBase(Vector2(300, 200), Vector2(120, 120), tint_color=ColorHelper.RED)
-    player = Player(TextureAtlas.get_texture('default_sprite.png'))
+    weapon = Player("cat_movement.png")
     pyglet.clock.schedule_interval(window.update, 1.0 / float(configs.DESIRED_FPS))
     pyglet.app.run()

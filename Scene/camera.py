@@ -1,6 +1,8 @@
 import numpy as np
 from pyrr import Matrix44
 
+import configs
+
 
 class Camera:
     _instance: 'Camera' = None
@@ -27,6 +29,22 @@ class Camera:
         cls._instance._zoom_matrix = Matrix44.from_scale([cls._instance.zoom] * 3)
         cls._instance._camera_matrix = np.array(cls._instance._projection_matrix * cls._instance._zoom_matrix,
                                                 dtype=np.float32)
+
+    @classmethod
+    def world_to_screen(cls, x: float, y: float) -> (int, int):
+        world_to_screen = cls.get_camera_matrix() * cls.get_view_matrix()
+        temp = np.dot(world_to_screen, np.array([x, y, 0, 0], dtype=np.float32))
+        s_x = round((temp[0] + 1.0) * 0.5 * configs.WINDOW_WIDTH)
+        s_y = round((temp[1] + 1.0) * 0.5 * configs.WINDOW_HEIGHT)
+        return s_x, s_y
+
+    @classmethod
+    def screen_to_world(cls, x: int, y: int) -> (float, float):
+        screen_to_world = np.linalg.inv(cls.get_camera_matrix() * cls.get_view_matrix())
+        s_x = 2.0 * (x / configs.WINDOW_WIDTH) - 1.0
+        s_y = 2.0 * (y / configs.WINDOW_HEIGHT) - 1.0
+        temp1 = np.dot(screen_to_world, np.array([s_x, s_y, -1, 1], dtype=np.float32))
+        return temp1[0], temp1[1]
 
     @classmethod
     def add_zoom(cls, zoom_value: float):

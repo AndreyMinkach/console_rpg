@@ -1,4 +1,7 @@
+import math
 from math import sqrt
+
+import numpy as np
 
 
 class Vector2:
@@ -7,6 +10,7 @@ class Vector2:
     """
     zero: 'Vector2' = None
     one: 'Vector2' = None
+    right: 'Vector2' = None
 
     def __init__(self, x: float, y: float):
         self.x = x
@@ -39,6 +43,14 @@ class Vector2:
             return Vector2.zero
         return self * (1 / length)
 
+    @classmethod
+    def angle_between(cls, v1: (float, float), v2: (float, float)):
+        dot = v1[0] * v2[0] + v1[1] * v2[1]
+        det = v1[0] * v2[1] - v1[1] * v2[0]
+        angle = math.atan2(det, dot)
+        return 360 - math.degrees(angle)
+
 
 Vector2.zero = Vector2(0, 0)
 Vector2.one = Vector2(1, 1)
+Vector2.right = Vector2(1, 0)
