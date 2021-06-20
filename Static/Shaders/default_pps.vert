@@ -5,6 +5,7 @@ layout(location = 2)in vec3 tex_coords;
 
 varying vec2 vertex_pos;
 varying vec2 vertex_uv;
+varying vec2 resolution;
 
 uniform vec2 screen_size;
 
@@ -18,4 +19,5 @@ void main()
     vertex_pos = to_clip_space(vertices);
     gl_Position = vec4(vertex_pos, 0.0, 1.0);
     vertex_uv = tex_coords.xy;
+    resolution = screen_size;
 }

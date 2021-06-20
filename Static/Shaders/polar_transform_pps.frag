@@ -5,6 +5,7 @@
 
 varying vec2 vertex_pos;
 varying vec2 vertex_uv;
+varying vec2 resolution;
 
 uniform sampler2D tex;
 

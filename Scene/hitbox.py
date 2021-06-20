@@ -1,7 +1,6 @@
 from typing import Callable, Any
 
 from Helpers.location_helper import Vector2
-from Scene.lighting import Lighting
 from Scene.spatial_hash import SpatialHash
 
 
@@ -9,15 +8,15 @@ class HitBox:
     """
     Represents a basic AABB for collision checks
     """
-    __slots__ = ['_position', '_size', '_anchor', 'light_caster', 'action', '_previous_position', '_right_upper',
+    __slots__ = ['_position', '_size', '_anchor', 'shadow_caster', 'action', '_previous_position', '_right_upper',
                  '_center', 'index_in_list']
 
     def __init__(self, position: Vector2, size: Vector2, anchor: Vector2 = Vector2(0.5, 0.5),
-                 light_caster: bool = False, action: Callable[..., Any] = None):
+                 shadow_caster: bool = False, action: Callable[..., Any] = None):
         self._position = position
         self._size = size
         self._anchor = anchor
-        self.light_caster = light_caster
+        self.shadow_caster = shadow_caster
         self._right_upper = position + size
         self._center = position + size * anchor
         self.index_in_list = None
@@ -31,8 +30,6 @@ class HitBox:
         """
         Does some post-initialization of the hitbox object
         """
-        if self.light_caster is True:
-            Lighting.add_caster(self)
         SpatialHash.add_hitbox(self)
 
     @property

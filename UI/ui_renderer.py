@@ -9,18 +9,9 @@ class UIRenderer:
 
     def __init__(self):
         self.__class__._instance = self
-        self._window_size: (int, int) = (0, 0)
         self._main_batch = Batch()
         self._main_group = OrderedGroup(0)
         self._ui_object_list = []
-
-    @classmethod
-    def get_window_size(cls) -> (int, int):
-        return cls._instance._window_size
-
-    @classmethod
-    def set_window_size(cls, value: (int, int)):
-        cls._instance._window_size = value
 
     @classmethod
     def get_main_batch(cls) -> Batch:

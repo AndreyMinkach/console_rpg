@@ -12,7 +12,7 @@ class FBO:
     def __init__(self, width: int, height: int):
         self.width = width
         self.height = height
-        self.texture: Texture = Texture.create(self.width, self.height, GL_RGB)
+        self.texture: Texture = Texture.create(self.width, self.height, GL_RGBA)
         self.frame_buffer = self.create_fbo()
 
         # we have to unbind created FBO

@@ -7,26 +7,43 @@ from pyglet.gl import glDeleteProgram, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
 from pyglet.sprite import SpriteGroup
 from pyshaders import ShaderProgram
 
-from UI.ui_renderer import UIRenderer
+import configs
+from Scene.camera import Camera
 
 pyshaders.transpose_matrices(False)
 
 
 class UniformSetter:
+    __slots__ = ['shader', '_uniforms', '_need_to_update', '_required_actions']
+
+    _required_uniform_names = ['screen_size', 'viewMatrix', 'projectionMatrix']
+    _required_uniform_getters = {
+        'screen_size': lambda: configs.get_window_size().tuple(),
+        'zoomMatrix': lambda: Camera.get_zoom_matrix(),
+        'viewMatrix': lambda: Camera.get_view_matrix(),
+        'projectionMatrix': lambda: Camera.get_projection_matrix()
+    }
+
     def __init__(self, shader: ShaderProgram):
         self.shader = shader
         self._uniforms = {}
         self._need_to_update = True
+        self._required_actions = {}  # these uniforms must be applied every frame
+
         for i in self.shader.uniforms:
             uniform_name = i[0]
             uniform_value = self.shader.uniforms.__getattr__(uniform_name)
-            if uniform_value is not None and uniform_name != 'screen_size':
-                self._uniforms[uniform_name] = [uniform_value, type(uniform_value)]
+            if uniform_value is not None and uniform_name not in UniformSetter._required_uniform_names:
+                self._uniforms[uniform_name] = uniform_value
+
+        # find out which of the required uniforms is presented in current shader
+        for key, value in UniformSetter._required_uniform_getters.items():
+            if key in self.shader.uniforms:
+                self._required_actions[key] = value
 
     def set_uniform(self, name: str, value):
         if name in self._uniforms.keys():
-            uniform_list = self._uniforms[name]
-            uniform_list[0] = value
+            self._uniforms[name] = value
             self._need_to_update = True
         else:
             warnings.warn(f"There is no uniform named '{name}' in the shader!!")
@@ -36,9 +53,15 @@ class UniformSetter:
             self.set_uniform(key, value)
 
     def apply(self):
+        # apply required uniforms
+        for key, value in self._required_actions.items():
+            self.shader.uniforms.__setattr__(key, value())
+
         if self._need_to_update:
+            # apply local uniform values
             for key, value in self._uniforms.items():
-                self.shader.uniforms.__setattr__(key, value[0])
+                self.shader.uniforms.__setattr__(key, value)
+
             self._need_to_update = False
 
 
@@ -53,8 +76,6 @@ class ShadedGroup(SpriteGroup):
     def set_state(self):
         super().set_state()
         self.shader.use()
-        if 'screen_size' in self.shader.uniforms:
-            self.shader.uniforms.screen_size = UIRenderer.get_window_size()
         self.uniform_setter.apply()
 
     def unset_state(self):

@@ -8,13 +8,14 @@ varying vec2 vertex_pos;
 varying vec2 vertex_uv;
 varying vec4 vertex_color;
 
+uniform mat4 zoomMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 void main()
 {
     vertex_pos = vertices;
-    gl_Position = projectionMatrix *  viewMatrix * vec4(vertices, 0.0, 1.0);
+    gl_Position = projectionMatrix * zoomMatrix *  viewMatrix * vec4(vertices, 0.0, 1.0);
     vertex_uv = tex_coords.xy;
     vertex_color = colors;
 }

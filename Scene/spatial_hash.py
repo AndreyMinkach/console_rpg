@@ -45,8 +45,8 @@ class SpatialHash:
         Returns the index of the cell which contains hitbox object
         """
         self = cls._instance
-        x = center.x // self.cell_size.x
-        y = center.y // self.cell_size.y
+        x = (center.x + self.half_world_size.x) // self.cell_size.x
+        y = (center.y + self.half_world_size.y) // self.cell_size.y
         return x + y * self.cells_number.x, x, y
 
     @classmethod
