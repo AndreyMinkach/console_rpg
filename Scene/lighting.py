@@ -271,6 +271,7 @@ class Lighting:
     def add_light(cls, light: Light):
         """
         Adds the light object to the lighting system
+
         :param light: Light instance to add
         """
         self = cls._instance
@@ -283,6 +284,7 @@ class Lighting:
     def remove_light(cls, light: Light):
         """
         Removes the light object from the lighting system
+
         :param light: Light instance to remove
         """
         self = cls._instance

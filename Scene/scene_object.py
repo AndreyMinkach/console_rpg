@@ -20,7 +20,7 @@ class SceneObject:
                  '_frame_index', '_texture', 'shader', 'uniforms', '_batch', '_group', 'vertex_list', '_hitbox',
                  '_shadow_caster']
 
-    def __init__(self, image=None, position=(0, 0), batch=None, group=None, shader: str = 'default'):
+    def __init__(self, image=None, position=(0, 0), batch=None, group=None, shader='default'):
         self._anchor: tuple = (0.5, 0.5)
         self._color: tuple = (1.0, 1.0, 1.0)
         self._position: tuple = position
@@ -44,8 +44,10 @@ class SceneObject:
 
         if isinstance(shader, ShaderProgram):
             self.shader = shader
-        else:
+        elif isinstance(shader, str):
             self.shader = ShaderManager.get_shader_by_name(shader)
+        else:
+            self.shader = ShaderManager.get_shader_by_name('default')
 
         self.uniforms = UniformSetter(self.shader)
         self._batch = batch if batch is not None else Renderer.batch()
