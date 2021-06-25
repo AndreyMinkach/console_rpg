@@ -1,6 +1,6 @@
 #version 330 core
 
-varying vec2 vertex_pos;
+varying vec3 vertex_pos;
 varying vec2 vertex_uv;
 varying vec4 vertex_color;
 

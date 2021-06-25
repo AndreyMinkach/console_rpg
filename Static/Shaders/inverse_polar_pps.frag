@@ -10,10 +10,8 @@ varying vec2 resolution;
 
 uniform sampler2D tex;
 uniform float texture_scale = 1.0;
-uniform bool hard_shadows = false;
+uniform int hard_shadows = 0;
 uniform vec2 light_offset = vec2(0.0, 0.0);
-uniform vec3 ambient = vec3(0.0, 0.0, 0.0);
-uniform vec3 light_color = vec3(1.0, 1.0, 1.0);
 uniform float light_intensity = 1.0;
 
 const float k = 20.0;
@@ -32,7 +30,7 @@ void main(void)
     vec2 uv = get_inverse_polar_uv(vertex_uv);
     vec3 tex_color;
 
-    if (hard_shadows == true)
+    if (hard_shadows == 1)
         tex_color = step(0.5, texture(tex, uv).rgb);
     else
         tex_color = texture(tex, uv).rgb;
@@ -46,9 +44,8 @@ void main(void)
     float inner_distance = distance_from_center / (inner_radius * resolution.y);
     float attenuation = 1.0 / (1.0 + k * inner_distance * inner_distance);
     attenuation *= smoothstep(outer_radius, inner_radius, distance_from_center / resolution.y);
+    attenuation *= light_intensity;
 
-    vec3 diffuse = attenuation * light_color;
-    vec3 total_light = ambient + diffuse;
-
-    gl_FragColor = vec4(tex_color * total_light, attenuation);
+    float alpha = (1.0 - tex_color.r) * attenuation;
+    gl_FragColor = vec4(vec3(0.0), alpha);
 }

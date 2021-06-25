@@ -30,6 +30,12 @@ class Vector2:
     def __repr__(self):
         return f"({self.x}, {self.y})"
 
+    def __eq__(self, other):
+        other_type = type(other)
+        if other_type != Vector2:
+            raise ValueError(f'ERROR: Cannot compare Vector2 instance with {other_type} instance!')
+        return self.x == other.x and self.y == other.y
+
     def length(self):
         return sqrt(self.x ** 2 + self.y ** 2)
 

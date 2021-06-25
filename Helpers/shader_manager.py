@@ -17,13 +17,13 @@ pyshaders.transpose_matrices(False)
 class UniformSetter:
     __slots__ = ['shader', '_uniforms', '_additional_textures', '_need_to_update', '_required_actions']
 
-    _required_uniform_names = ['screen_size', 'viewMatrix', 'projectionMatrix']
     _required_uniform_getters = {
         'screen_size': lambda: configs.get_window_size().tuple(),
         'zoomMatrix': lambda: Camera.get_zoom_matrix(),
         'viewMatrix': lambda: Camera.get_view_matrix(),
         'projectionMatrix': lambda: Camera.get_projection_matrix()
     }
+    _required_uniform_names = set(_required_uniform_getters.keys())
 
     def __init__(self, shader: ShaderProgram):
         self.shader = shader

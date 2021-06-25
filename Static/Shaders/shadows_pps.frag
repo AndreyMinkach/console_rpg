@@ -10,8 +10,8 @@ varying vec2 vertex_uv;
 varying vec2 resolution;
 
 uniform sampler2D tex;
-uniform int pixels_to_skip = 2;// the more number the better performance
-uniform int shadow_bias = 2;// helps to fix the issue when the shadow is rendered behind the object
+uniform float pixels_to_skip = 2;// the more number the better performance
+uniform float shadow_bias = 2;// helps to fix the issue when the shadow is rendered behind the object
 
 const float acos_zero = acos(0);
 

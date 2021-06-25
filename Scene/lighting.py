@@ -6,13 +6,73 @@ from pyglet.image import Texture
 
 from Helpers.atlas_helper import TextureAtlas
 from Helpers.location_helper import Vector2
+from Helpers.shader_manager import ShaderManager, UniformSetter, ShadedGroup
 from Scene.PostProcessing.post_effect import PostEffect
 from Scene.camera import Camera
 
 
+class LightCookieQuad:
+    def __init__(self,
+                 position: Vector2 = Vector2.zero,
+                 size: Vector2 = Vector2.one,
+                 color: (float, float, float) = (1.0, 1.0, 1.0),
+                 blend_src: int = GL_SRC_ALPHA,
+                 blend_dest: int = GL_ONE_MINUS_SRC_ALPHA
+                 ):
+        self._position: Vector2 = position
+        self._size: Vector2 = size
+        self._anchor: Vector2 = Vector2(0.5, 0.5)
+        self._color = color
+        self._texture = Lighting.get_light_cookie_texture()
+        self._shader = ShaderManager.get_shader_by_name('default_ui')
+        self.uniforms = UniformSetter(self._shader)
+        self._batch = Lighting.get_light_cookie_batch()
+        self._group = ShadedGroup(self._texture, self._shader, self.uniforms, None, blend_src, blend_dest)
+        self._create_vertex_list()
+
+    @property
+    def position(self) -> Vector2:
+        return self._position
+
+    @position.setter
+    def position(self, value: Vector2):
+        self._position = value
+        self._update_vertices()
+
+    @property
+    def color(self) -> Vector2:
+        return self._color
+
+    @color.setter
+    def color(self, value: Vector2):
+        self._color = value
+        self._update_color()
+
+    def draw(self):
+        self._batch.draw()
+
+    def _create_vertex_list(self):
+        self.vertex_list = self._batch.add(
+            4, pyglet.gl.GL_QUADS, self._group, 'v2f', 'c4f', ('t3f', self._texture.tex_coords))
+        self._update_vertices()
+        self._update_color()
+
+    def _update_vertices(self):
+        x1 = self._position.x - self._anchor.x * self._size.x
+        y1 = self._position.y - self._anchor.y * self._size.y
+        x2 = x1 + 1 * self._size.x
+        y2 = y1 + 1 * self._size.y
+        vertices = (x1, y1, x2, y1, x2, y2, x1, y2)
+        self.vertex_list.vertices[:] = vertices
+
+    def _update_color(self):
+        r, g, b = self._color
+        self.vertex_list.colors[:] = [r * 255, g * 255, b * 255, 255] * 4
+
+
 class Light:
-    __slots__ = ['position', '_size', '_intensity', '_color', '_hard_shadows', '_shadow_bias', '_pixels_to_skip',
-                 'polar_transform_effect', 'shadows_effect', 'inverse_polar_effect', '_previous_center']
+    __slots__ = ['_position', '_size', '_intensity', '_color', '_hard_shadows', '_shadow_bias', '_pixels_to_skip',
+                 'polar_transform_effect', 'shadows_effect', 'inverse_polar_effect', '_previous_center', '_cookie_quad']
 
     def __init__(self,
                  position: Vector2,
@@ -31,21 +91,13 @@ class Light:
         :param shadow_bias: Offset from the center of the light's origin in pixels
         :param pixels_to_skip: Pixels number to skip in the shadow shader loop. Higher values gives a better performance
         """
-        self.position = position
-        self._intensity = intensity
+        self._position = position
         self._color = color
-        self._hard_shadows = hard_shadows
-        self._shadow_bias = shadow_bias
-        self._pixels_to_skip = pixels_to_skip
         # Size of the lighting effects in screen space
         size = Vector2(*Lighting.get_light_size())
         self._size = size
-        # self._texture = None
-        # self._shader = ShaderManager.get_shader_by_name(shader_name)
-        # self.uniforms = UniformSetter(self._shader)
-        # self._batch = Batch()
-        # self._group = ShadedGroup(self._texture, self._shader, self.uniforms, None, blend_src, blend_dest)
-        # self._create_vertex_list()
+        cookie_quad_pos = Vector2(*Camera.world_to_screen(position.x, position.y))
+        self._cookie_quad: LightCookieQuad = LightCookieQuad(position=cookie_quad_pos, size=Vector2(size.y, size.y))
 
         self.polar_transform_effect: PostEffect = PostEffect(size.x, size.y, 'polar_transform_pps')
         self.shadows_effect: PostEffect = PostEffect(size.x, size.y, 'shadows_pps')
@@ -53,6 +105,11 @@ class Light:
         # self.set_blend_func(GL_SRC_ALPHA, GL_ONE)
 
         self._previous_center: Vector2 = Vector2(None, None)
+
+        self.intensity = intensity
+        self.hard_shadows = hard_shadows
+        self.shadow_bias = shadow_bias
+        self.pixels_to_skip = pixels_to_skip
 
         self.set_resolution(*Lighting.get_light_resolution())
         self.color = color
@@ -66,6 +123,19 @@ class Light:
         del self.polar_transform_effect
         del self.shadows_effect
         del self.inverse_polar_effect
+
+    @property
+    def position(self) -> Vector2:
+        return self._position
+
+    @position.setter
+    def position(self, value: Vector2):
+        self._position = value
+        self._cookie_quad.position = value
+
+    def set_cookie_quad_position(self, pos: Vector2):
+        if self._cookie_quad.position != pos:
+            self._cookie_quad.position = pos
 
     @property
     def intensity(self) -> float:
@@ -83,7 +153,7 @@ class Light:
     @color.setter
     def color(self, value: (float, float, float)):
         self._color = value
-        self.inverse_polar_effect.uniforms.set_uniform('light_color', value)
+        self._cookie_quad.color = value
 
     @property
     def hard_shadows(self) -> bool:
@@ -92,7 +162,7 @@ class Light:
     @hard_shadows.setter
     def hard_shadows(self, value: bool):
         self._hard_shadows = value
-        self.inverse_polar_effect.uniforms.set_uniform('hard_shadows', value)
+        self.inverse_polar_effect.uniforms.set_uniform('hard_shadows', int(value))
 
     @property
     def shadow_bias(self) -> float:
@@ -188,14 +258,15 @@ class Light:
 
 class Lighting:
     _instance: 'Lighting' = None
-    __slots__ = ['lights', 'shadow_casters', '_batch', '_camera_lighting_zoom', '_zoom_divisor', '_light_size',
-                 '_light_resolution', '_light_cookie']
+    __slots__ = ['lights', 'shadow_casters', '_batch', '_light_cookie_batch', '_camera_lighting_zoom', '_zoom_divisor',
+                 '_light_size', '_light_resolution', '_light_cookie']
 
     def __init__(self, window_width: int, window_height: int, camera_lighting_zoom: float = 30,
                  light_resolution: Vector2 = Vector2(256, 256)):
         self.__class__._instance = self
         self.lights: Set[Light] = set()
         self._batch = Batch()
+        self._light_cookie_batch = Batch()
         self._camera_lighting_zoom = camera_lighting_zoom
         self._zoom_divisor = camera_lighting_zoom / Camera.get_zoom()
         self._light_size = Vector2(window_width, window_height)
@@ -211,6 +282,13 @@ class Lighting:
         Returns the light cookie texture
         """
         return cls._instance._light_cookie
+
+    @classmethod
+    def get_light_cookie_batch(cls) -> Batch:
+        """
+        Returns the light cookie batch object
+        """
+        return cls._instance._light_cookie_batch
 
     @classmethod
     def get_zoom_divisor(cls) -> float:
@@ -313,6 +391,8 @@ class Lighting:
         current_camera_pos = Camera.get_position()
 
         Camera.set_zoom(self._camera_lighting_zoom)
+        self._light_cookie_batch.draw()
+
         for light in self.lights:
             Camera.set_position(light.position.x, light.position.y)
             light.draw()
@@ -322,5 +402,6 @@ class Lighting:
         for light in self.lights:
             light_effects_center_pos = Camera.world_to_screen(light.position.x, light.position.y)
             light.set_position_by_center(*light_effects_center_pos)
+            light.set_cookie_quad_position(Vector2(*light_effects_center_pos))
 
         # print((time.time() - start) * 1000)
