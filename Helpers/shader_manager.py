@@ -3,7 +3,8 @@ import warnings
 from os import path
 
 import pyshaders
-from pyglet.gl import glDeleteProgram, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+from pyglet.gl import glDeleteProgram, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SAMPLER_2D, glUniform1i, \
+    glActiveTexture, glBindTexture, GL_TEXTURE0
 from pyglet.sprite import SpriteGroup
 from pyshaders import ShaderProgram
 
@@ -14,7 +15,7 @@ pyshaders.transpose_matrices(False)
 
 
 class UniformSetter:
-    __slots__ = ['shader', '_uniforms', '_need_to_update', '_required_actions']
+    __slots__ = ['shader', '_uniforms', '_additional_textures', '_need_to_update', '_required_actions']
 
     _required_uniform_names = ['screen_size', 'viewMatrix', 'projectionMatrix']
     _required_uniform_getters = {
@@ -27,14 +28,17 @@ class UniformSetter:
     def __init__(self, shader: ShaderProgram):
         self.shader = shader
         self._uniforms = {}
+        self._additional_textures = {}
         self._need_to_update = True
         self._required_actions = {}  # these uniforms must be applied every frame
 
-        for i in self.shader.uniforms:
-            uniform_name = i[0]
-            uniform_value = self.shader.uniforms.__getattr__(uniform_name)
-            if uniform_value is not None and uniform_name not in UniformSetter._required_uniform_names:
-                self._uniforms[uniform_name] = uniform_value
+        for name, uniform in self.shader.uniforms:
+            if uniform.type == GL_SAMPLER_2D and name != 'tex':
+                self._additional_textures[name] = [uniform, len(self._additional_textures) + 1]
+            # if uniform_value is not None and name not in UniformSetter._required_uniform_names:
+            if name not in UniformSetter._required_uniform_names:
+                uniform_value = self.shader.uniforms.__getattr__(name)
+                self._uniforms[name] = uniform_value
 
         # find out which of the required uniforms is presented in current shader
         for key, value in UniformSetter._required_uniform_getters.items():
@@ -42,20 +46,36 @@ class UniformSetter:
                 self._required_actions[key] = value
 
     def set_uniform(self, name: str, value):
-        if name in self._uniforms.keys():
+        if name in self._uniforms:
             self._uniforms[name] = value
             self._need_to_update = True
         else:
-            warnings.warn(f"There is no uniform named '{name}' in the shader!!")
+            warnings.warn(f"There is no uniform named '{name}' in the shader!")
 
     def set_uniforms(self, uniform_dict: dict):
         for key, value in uniform_dict.items():
             self.set_uniform(key, value)
 
+    def set_texture_unit(self, name: str, unit: int):
+        """
+        Sets a unit for additional texture
+
+        :param name: Texture sample name in the shader
+        :param unit: New texture unit
+        """
+        if name in self._additional_textures:
+            self._additional_textures[name][1] = unit
+        else:
+            warnings.warn(f"There is no additional texture named '{name}' in the shader!")
+
     def apply(self):
         # apply required uniforms
         for key, value in self._required_actions.items():
             self.shader.uniforms.__setattr__(key, value())
+
+        # apply texture uniforms
+        for uniform, texture_unit in self._additional_textures.values():
+            glUniform1i(uniform.loc, texture_unit)
 
         if self._need_to_update:
             # apply local uniform values
@@ -72,15 +92,21 @@ class ShadedGroup(SpriteGroup):
         super().__init__(texture, blend_src, blend_dest, parent)
         self.shader: ShaderProgram = shader
         self.uniform_setter = uniform_setter
+        self.shader_support = True
+        self.additional_textures: list = []
 
     def set_state(self):
         super().set_state()
         self.shader.use()
         self.uniform_setter.apply()
+        for i, texture in enumerate(self.additional_textures, start=1):
+            glActiveTexture(GL_TEXTURE0 + i)
+            glBindTexture(texture.target, texture.id)
 
     def unset_state(self):
         super().unset_state()
         self.shader.clear()
+        glActiveTexture(GL_TEXTURE0)
 
 
 class ShaderManager:
@@ -97,14 +123,14 @@ class ShaderManager:
     @staticmethod
     def _from_string(verts, frags):
         """
-            High level loading function.
+        High level loading function.
 
-            Load a shader using sources passed in sequences of string.
-            Each source is compiled in a shader unique shader object.
-            Return a linked shaderprogram. The shaderprogram owns the gl resource.
+        Load a shader using sources passed in sequences of string.
+        Each source is compiled in a shader unique shader object.
+        Return a linked shaderprogram. The shaderprogram owns the gl resource.
 
-            verts: Sequence of vertex shader sources
-            frags: Sequence of fragment shader sources
+        verts: Sequence of vertex shader sources
+        frags: Sequence of fragment shader sources
         """
         if isinstance(verts, str):
             verts = (verts,)

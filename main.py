@@ -37,6 +37,7 @@ if __name__ == '__main__':
     # configs.set_window_size(500, 500)
     # Lighting.set_resolution(1024, 1024)
     # Lighting.set_resolution(512, 512)
+    # Lighting.set_resolution(256, 256)
 
     import math
 
@@ -54,22 +55,10 @@ if __name__ == '__main__':
         window.object_list.append(scene_object1)
 
     for _ in range(1):
-        window.light1 = Light(Vector2(6, 3))
-        window.light2 = Light(Vector2(-6, 3))
-        window.light3 = Light(Vector2(6, -3))
-        window.light4 = Light(Vector2(-6, -3))
-
-    from timeit import timeit
-
-    # test1 = Camera.world_to_screen(1, 1)
-    # test2 = Camera.world_to_screen1(1, 1)
-    # test3 = Camera.screen_to_world(1, 1)
-    # test4 = Camera.screen_to_world1(1, 1)
-    #
-    # temp1 = timeit(lambda: Camera.world_to_screen(1, 1), number=100000)
-    # temp2 = timeit(lambda: Camera.world_to_screen1(1, 1), number=100000)
-    # temp3 = timeit(lambda: Camera.screen_to_world(1, 1), number=100000)
-    # temp4 = timeit(lambda: Camera.screen_to_world1(1, 1), number=100000)
+        window.light1 = Light(Vector2(6, 3), color=(1.0, 0.0, 0.0))
+        window.light2 = Light(Vector2(-6, 3), color=(0.0, 1.0, 0.0))
+        window.light3 = Light(Vector2(6, -3), color=(0.0, 0.0, 1.0))
+        window.light4 = Light(Vector2(-6, -3), color=(1.0, 1.0, 1.0))
 
     temp_sprite = UISprite("image.png", Vector2(200, 200), Vector2(120, 120), 3, 0, 8, Vector2(120, 120), 4, 8,
                            scale=1.0)

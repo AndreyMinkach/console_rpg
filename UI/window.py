@@ -1,9 +1,7 @@
 import math
 import time
-from abc import ABC
 
 from pyglet.gl import *
-from pyglet.shapes import Rectangle
 
 from Helpers.color_helper import ColorHelper
 from Helpers.input_helper import InputHelper
@@ -33,7 +31,7 @@ class MyWindow(pyglet.window.Window):
 
         Lighting.draw()
         Renderer.draw()
-        # UIRenderer.draw()
+        UIRenderer.draw()
 
         self.invalid = False
 

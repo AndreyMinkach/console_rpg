@@ -1,16 +1,26 @@
 import pyglet
+from pyglet.gl import GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
 from pyglet.graphics import Batch, glClearColor, glClear, GL_COLOR_BUFFER_BIT
 
 from Helpers.shader_manager import ShaderManager, UniformSetter, ShadedGroup
-from Scene.PostProcessing.fbo import FBO
+from Scene.PostProcessing.fbo import FBO, FBOAttachment
 
 
 class PostEffect:
     __slots__ = ['fbo', 'width', 'height', 'x', 'y', '_shader', 'uniforms', '_texture', '_batch', '_group',
-                 'vertex_list', '_clear_color']
+                 'vertex_list', '_clear_color', '_clear_mask']
 
-    def __init__(self, width: int, height: int, shader_name: str, fbo_resolution: (int, int) = (256, 256),
-                 clear_color: (float, float, float, float) = (1.0, 1.0, 1.0, 1.0)):
+    def __init__(self,
+                 width: int,
+                 height: int,
+                 shader_name: str,
+                 fbo_resolution: (int, int) = (256, 256),
+                 clear_color: (float, float, float, float) = (1.0, 1.0, 1.0, 1.0),
+                 clear_mask: int = GL_COLOR_BUFFER_BIT,
+                 blend_src: int = GL_SRC_ALPHA,
+                 blend_dest: int = GL_ONE_MINUS_SRC_ALPHA,
+                 fbo_attachment: FBOAttachment = FBOAttachment.Color
+                 ):
         """
         Initializes a new PostEffect object
 
@@ -20,18 +30,23 @@ class PostEffect:
         :param fbo_resolution: The resolution of the effect's FBO
         :param clear_color: Clear color of the effect's FBO
         """
-        self.fbo = FBO(*fbo_resolution)
+        self.fbo = FBO(*fbo_resolution, fbo_attachment=fbo_attachment)
         self.width = width
         self.height = height
         self.x = 0
         self.y = 0
         self._clear_color = clear_color
+        self._clear_mask = clear_mask
         self._texture = self.fbo.texture
         self._shader = ShaderManager.get_shader_by_name(shader_name)
         self.uniforms = UniformSetter(self._shader)
         self._batch = Batch()
-        self._group = ShadedGroup(self._texture, self._shader, self.uniforms, None)
+        self._group = ShadedGroup(self._texture, self._shader, self.uniforms, None, blend_src, blend_dest)
         self._create_vertex_list()
+
+    @property
+    def group(self) -> ShadedGroup:
+        return self._group
 
     def bind(self):
         """
@@ -40,7 +55,7 @@ class PostEffect:
         """
         self.fbo.bind_fbo()
         glClearColor(*self._clear_color)
-        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(self._clear_mask)
 
     def unbind(self):
         """

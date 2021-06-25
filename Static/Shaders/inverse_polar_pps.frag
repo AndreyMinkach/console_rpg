@@ -10,10 +10,13 @@ varying vec2 resolution;
 
 uniform sampler2D tex;
 uniform float texture_scale = 1.0;
+uniform bool hard_shadows = false;
 uniform vec2 light_offset = vec2(0.0, 0.0);
 uniform vec3 ambient = vec3(0.0, 0.0, 0.0);
 uniform vec3 light_color = vec3(1.0, 1.0, 1.0);
 uniform float light_intensity = 1.0;
+
+const float k = 20.0;
 
 vec2 get_inverse_polar_uv(vec2 in_uv)
 {
@@ -24,12 +27,15 @@ vec2 get_inverse_polar_uv(vec2 in_uv)
     return vec2(r, theta);
 }
 
-const float k = 20.0;
-
 void main(void)
 {
     vec2 uv = get_inverse_polar_uv(vertex_uv);
-    vec3 tex_color = texture(tex, uv).xyz;
+    vec3 tex_color;
+
+    if (hard_shadows == true)
+        tex_color = step(0.5, texture(tex, uv).rgb);
+    else
+        tex_color = texture(tex, uv).rgb;
 
     vec2 scaled_resolution = resolution * texture_scale;
     vec2 center = gl_FragCoord.xy - scaled_resolution.xy * 0.5 - light_offset;

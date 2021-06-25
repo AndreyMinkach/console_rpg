@@ -42,8 +42,8 @@ void main(void)
     float shadow_limit = get_shadow_limit(uv);
 
     for (float xx = uv.x - pixel_size; xx >= 0.0 && xx <= shadow_limit; xx -= pixel_size){
-        //        pixel_size = (xx * steps_number + 1.0) / tex_size.x;
-        float local_x = max(uv.x - xx - shadow_offset, 0.0 + shadow_offset);
+        //pixel_size = (xx * steps_number + 1.0) / tex_size.x;
+        float local_x = max(uv.x - xx - shadow_offset, shadow_offset);
         tex_value *= texture(tex, vec2(local_x, uv.y)).r;
     }
 

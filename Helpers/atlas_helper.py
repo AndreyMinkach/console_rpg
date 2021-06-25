@@ -11,17 +11,22 @@ class TextureAtlas:
     _textures = {}
 
     @classmethod
-    def add_texture(cls, texture: AbstractImage, border: int = 0) -> TextureRegion:
+    def add_texture(cls, texture: AbstractImage, border: int = 0, tex_filter: int = GL_NEAREST) -> TextureRegion:
         texture_region = cls._texture_atlas.add(texture, border)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tex_filter)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, tex_filter)
+
         return texture_region
 
     @classmethod
-    def load_image(cls, image_path: str, folder: str = 'Static/Images/', border=0) -> TextureRegion:
+    def load_image(cls, image_path: str, folder: str = 'Static/Images/', border=0, tex_filter: int = GL_NEAREST,
+                   add_to_atlas: bool = True) -> TextureRegion:
         full_path = folder + image_path
         if full_path not in cls._textures:
-            texture = cls.add_texture(pyglet.image.load(full_path), border)
+            if add_to_atlas is True:
+                texture = cls.add_texture(pyglet.image.load(full_path), border, tex_filter)
+            else:
+                texture = pyglet.image.load(full_path).get_texture()
             cls._textures[full_path] = texture
             return texture
         return cls._textures[full_path]

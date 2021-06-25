@@ -1,22 +1,39 @@
 from ctypes import byref
+from enum import Enum
 
 from pyglet.gl import *
 from pyglet.image import Texture
 
 import configs
+from Helpers import helper
+
+
+class FBOAttachment(Enum):
+    Color = dict(internal_format=GL_RGBA, data_type=GL_UNSIGNED_BYTE, attachment=GL_COLOR_ATTACHMENT0)
+    Depth = dict(internal_format=GL_DEPTH_COMPONENT, data_type=GL_FLOAT, attachment=GL_DEPTH_ATTACHMENT)
 
 
 class FBO:
     __slots__ = ['width', 'height', 'frame_buffer', 'texture']
 
-    def __init__(self, width: int, height: int):
+    def __init__(self,
+                 width: int,
+                 height: int,
+                 fbo_attachment: FBOAttachment = FBOAttachment.Color
+                 ):
+        """
+        Initializes a new FBO with specified parameters
+
+        :param width: FBO texture width
+        :param height: FBO texture height
+        """
+
         self.width = width
         self.height = height
-        self.texture: Texture = Texture.create(self.width, self.height, GL_RGBA)
-        self.frame_buffer = self.create_fbo()
-
-        # we have to unbind created FBO
-        self.unbind_fbo()
+        fbo_parameters = fbo_attachment.value
+        self.texture: Texture = helper.create_texture(width, height, internal_format=fbo_parameters['internal_format'],
+                                                      data_type=fbo_parameters['data_type'], allocate_memory=False)
+        self.frame_buffer = self.create_fbo(fbo_parameters['attachment'])
 
     def __del__(self):
         self.unbind_fbo()
@@ -39,18 +56,20 @@ class FBO:
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         glViewport(0, 0, configs.WINDOW_WIDTH, configs.WINDOW_HEIGHT)
 
-    def create_fbo(self):
+    def create_fbo(self, attachment: int):
         """
         Creates and initializes a new FrameBufferObject
         """
         frame_buffer = GLuint(0)
         glGenFramebuffers(1, byref(frame_buffer))
         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer)
-        glDrawBuffer(GL_COLOR_ATTACHMENT0)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture.id, 0)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, self.texture.id, 0)
 
         # check for errors
         if glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE:
             print('ERROR: Frame buffer is not complete!')
+
+        # we have to unbind created FBO
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
         return frame_buffer
